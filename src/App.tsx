@@ -18,6 +18,7 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { FloatingContactButton } from './components/FloatingContactButton';
 import { AdminRoute } from './components/admin/AdminRoute';
+import { AdminSetup } from './components/admin/AdminSetup';
 import { useTheme } from './context/ThemeContext';
 
 export default function App() {
@@ -29,8 +30,35 @@ export default function App() {
     if (typeof window === 'undefined') return false;
     const path = window.location.pathname;
     const hash = window.location.hash;
-    return path === '/admin' || path.startsWith('/admin/') || hash === '#admin' || hash === '#/admin';
+    return path === '/admin' || path.startsWith('/admin/') || hash === '#admin' || hash === '#/admin' || hash.startsWith('#/admin/') || hash.startsWith('#admin/');
   });
+
+  // Dedicated One-Time Setup Route (/admin/setup)
+  const [isSetupRoute, setIsSetupRoute] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    return path === '/admin/setup' || path.startsWith('/admin/setup') || hash === '#/admin/setup' || hash === '#admin/setup';
+  });
+
+  // Listen to popstate and hashchange for in-page navigation
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const path = window.location.pathname;
+      const hash = window.location.hash;
+      const admin = path === '/admin' || path.startsWith('/admin/') || hash === '#admin' || hash === '#/admin' || hash.startsWith('#/admin/') || hash.startsWith('#admin/');
+      const setup = path === '/admin/setup' || path.startsWith('/admin/setup') || hash === '#/admin/setup' || hash === '#admin/setup';
+      setIsAdminRoute(admin);
+      setIsSetupRoute(setup);
+    };
+
+    window.addEventListener('popstate', handleRouteChange);
+    window.addEventListener('hashchange', handleRouteChange);
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+      window.removeEventListener('hashchange', handleRouteChange);
+    };
+  }, []);
 
   // Pre-fill state for contact form when user triggers service or pricing cards
   const [selectedService, setSelectedService] = useState<string>('Website Design & Development');
@@ -127,11 +155,28 @@ export default function App() {
 
   // If viewing the private owner admin route
   if (isAdminRoute) {
+    if (isSetupRoute) {
+      return (
+        <AdminSetup
+          onBackToSite={() => {
+            window.history.pushState({}, '', '/');
+            setIsAdminRoute(false);
+            setIsSetupRoute(false);
+          }}
+          onGoToLogin={() => {
+            window.history.pushState({}, '', '/admin');
+            setIsSetupRoute(false);
+          }}
+        />
+      );
+    }
+
     return (
       <AdminRoute
         onBackToSite={() => {
           window.history.pushState({}, '', '/');
           setIsAdminRoute(false);
+          setIsSetupRoute(false);
         }}
       />
     );

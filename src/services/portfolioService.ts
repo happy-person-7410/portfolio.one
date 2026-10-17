@@ -1,14 +1,8 @@
-import {
-  collection,
-  doc,
-  getDocs,
-  setDoc,
-  deleteDoc,
-  onSnapshot,
-  query,
-  orderBy
-} from 'firebase/firestore';
-import { db, auth, isOwner, handleFirestoreError, OperationType } from '../lib/firebase';
+/**
+ * Portfolio Data Service for Happy Person Creative Studio.
+ * Interfaces with the secure server-side Neon PostgreSQL API.
+ */
+
 import { Project, Service, PricingPlan, Testimonial, FaqItem, SiteProfile } from '../types';
 import {
   PROJECTS as DEFAULT_PROJECTS,
@@ -16,371 +10,386 @@ import {
   PRICING_PLANS as DEFAULT_PRICING,
   TESTIMONIALS as DEFAULT_TESTIMONIALS,
   FAQ_ITEMS as DEFAULT_FAQS,
-  PROFILE_INFO as DEFAULT_PROFILE
+  PROFILE_INFO as DEFAULT_PROFILE,
 } from '../data/portfolioData';
 
-// Firestore collection names
-export const COLLECTIONS = {
-  PROJECTS: 'projects',
-  SERVICES: 'services',
-  PRICING: 'pricingPlans',
-  TESTIMONIALS: 'testimonials',
-  FAQS: 'faqs',
-  SETTINGS: 'settings',
-} as const;
-
-// Auto-seed database if empty (Only permitted for authenticated owner)
-export async function seedInitialDataIfEmpty(): Promise<boolean> {
-  // Never attempt write operations if user is not signed in as owner
-  if (!auth.currentUser || !isOwner(auth.currentUser.email)) {
-    return false;
+// Re-seed database with default rich portfolio data
+export async function forceSeedDatabase(): Promise<void> {
+  const res = await fetch('/api/db/seed', { method: 'POST' });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to re-seed database');
   }
+}
+
+export async function seedInitialDataIfEmpty(): Promise<boolean> {
   try {
-    const projectsSnap = await getDocs(collection(db, COLLECTIONS.PROJECTS));
-    if (projectsSnap.empty) {
-      console.log('Database empty, auto-seeding default portfolio data as authenticated owner...');
+    const projects = await fetchProjects();
+    if (projects.length === 0) {
       await forceSeedDatabase();
       return true;
     }
     return false;
-  } catch (error) {
-    console.warn('Could not auto-seed database:', error);
+  } catch (err) {
+    console.warn('Could not auto-seed database:', err);
     return false;
-  }
-}
-
-// Force seed database with all initial rich portfolio data
-export async function forceSeedDatabase(): Promise<void> {
-  if (!auth.currentUser || !isOwner(auth.currentUser.email)) {
-    throw new Error('Only the authenticated portfolio owner (danahobi20@gmail.com) can seed the database.');
-  }
-  try {
-    // 1. Seed Projects
-    for (let i = 0; i < DEFAULT_PROJECTS.length; i++) {
-      const p = DEFAULT_PROJECTS[i];
-      const projectDoc: Project = {
-        ...p,
-        order: i + 1,
-        featured: i < 3,
-        hidden: false,
-        updatedAt: new Date().toISOString()
-      };
-      await setDoc(doc(db, COLLECTIONS.PROJECTS, p.id), projectDoc);
-    }
-
-    // 2. Seed Services
-    for (let i = 0; i < DEFAULT_SERVICES.length; i++) {
-      const s = DEFAULT_SERVICES[i];
-      const serviceDoc: Service = {
-        ...s,
-        order: i + 1,
-        updatedAt: new Date().toISOString()
-      };
-      await setDoc(doc(db, COLLECTIONS.SERVICES, s.id), serviceDoc);
-    }
-
-    // 3. Seed Pricing Plans
-    for (let i = 0; i < DEFAULT_PRICING.length; i++) {
-      const plan = DEFAULT_PRICING[i];
-      const planDoc: PricingPlan = {
-        ...plan,
-        order: i + 1,
-        updatedAt: new Date().toISOString()
-      };
-      await setDoc(doc(db, COLLECTIONS.PRICING, plan.id), planDoc);
-    }
-
-    // 4. Seed Testimonials
-    for (let i = 0; i < DEFAULT_TESTIMONIALS.length; i++) {
-      const t = DEFAULT_TESTIMONIALS[i];
-      const testDoc: Testimonial = {
-        ...t,
-        order: i + 1,
-        updatedAt: new Date().toISOString()
-      };
-      await setDoc(doc(db, COLLECTIONS.TESTIMONIALS, t.id), testDoc);
-    }
-
-    // 5. Seed FAQs
-    for (let i = 0; i < DEFAULT_FAQS.length; i++) {
-      const f = DEFAULT_FAQS[i];
-      const id = `faq-${i + 1}`;
-      const faqDoc: FaqItem = {
-        id,
-        question: f.question,
-        answer: f.answer,
-        order: i + 1,
-        updatedAt: new Date().toISOString()
-      };
-      await setDoc(doc(db, COLLECTIONS.FAQS, id), faqDoc);
-    }
-
-    // 6. Seed Site Profile
-    await setDoc(doc(db, COLLECTIONS.SETTINGS, 'profile'), {
-      ...DEFAULT_PROFILE,
-      updatedAt: new Date().toISOString()
-    });
-
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, 'seedInitialData');
   }
 }
 
 // ----------------- Projects API -----------------
 
+export async function fetchProjects(): Promise<Project[]> {
+  try {
+    const res = await fetch('/api/projects');
+    if (!res.ok) return DEFAULT_PROJECTS;
+    const data = await res.json();
+    return data && data.length > 0 ? data : DEFAULT_PROJECTS;
+  } catch (err) {
+    console.warn('Failed to fetch projects, using defaults:', err);
+    return DEFAULT_PROJECTS;
+  }
+}
+
 export function subscribeToProjects(
   onSuccess: (projects: Project[]) => void,
   onError?: (error: unknown) => void
 ) {
-  const q = query(collection(db, COLLECTIONS.PROJECTS), orderBy('order', 'asc'));
-  return onSnapshot(
-    q,
-    (snapshot) => {
-      if (snapshot.empty) {
+  let active = true;
+  fetchProjects()
+    .then((projects) => {
+      if (active) onSuccess(projects);
+    })
+    .catch((err) => {
+      if (active) {
+        if (onError) onError(err);
         onSuccess(DEFAULT_PROJECTS);
-        return;
       }
-      const items: Project[] = [];
-      snapshot.forEach((doc) => {
-        items.push(doc.data() as Project);
-      });
-      onSuccess(items);
-    },
-    (error) => {
-      if (onError) onError(error);
-      handleFirestoreError(error, OperationType.GET, COLLECTIONS.PROJECTS);
+    });
+
+  // Polling fallback to keep admin changes in sync
+  const interval = setInterval(async () => {
+    try {
+      const data = await fetchProjects();
+      if (active) onSuccess(data);
+    } catch (e) {
+      // keep previous state
     }
-  );
+  }, 10000);
+
+  return () => {
+    active = false;
+    clearInterval(interval);
+  };
 }
 
 export async function saveProject(project: Project): Promise<void> {
-  const path = `${COLLECTIONS.PROJECTS}/${project.id}`;
-  try {
-    const docData: Project = {
-      ...project,
-      updatedAt: new Date().toISOString()
-    };
-    await setDoc(doc(db, COLLECTIONS.PROJECTS, project.id), docData);
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+  const res = await fetch('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(project),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to save project');
   }
 }
 
 export async function deleteProject(projectId: string): Promise<void> {
-  const path = `${COLLECTIONS.PROJECTS}/${projectId}`;
-  try {
-    await deleteDoc(doc(db, COLLECTIONS.PROJECTS, projectId));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
+  const res = await fetch(`/api/projects/${projectId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to delete project');
   }
 }
 
 // ----------------- Services API -----------------
 
+export async function fetchServices(): Promise<Service[]> {
+  try {
+    const res = await fetch('/api/services');
+    if (!res.ok) return DEFAULT_SERVICES;
+    const data = await res.json();
+    return data && data.length > 0 ? data : DEFAULT_SERVICES;
+  } catch (err) {
+    return DEFAULT_SERVICES;
+  }
+}
+
 export function subscribeToServices(
   onSuccess: (services: Service[]) => void,
   onError?: (error: unknown) => void
 ) {
-  const q = query(collection(db, COLLECTIONS.SERVICES), orderBy('order', 'asc'));
-  return onSnapshot(
-    q,
-    (snapshot) => {
-      if (snapshot.empty) {
+  let active = true;
+  fetchServices()
+    .then((services) => {
+      if (active) onSuccess(services);
+    })
+    .catch((err) => {
+      if (active) {
+        if (onError) onError(err);
         onSuccess(DEFAULT_SERVICES);
-        return;
       }
-      const items: Service[] = [];
-      snapshot.forEach((doc) => {
-        items.push(doc.data() as Service);
-      });
-      onSuccess(items);
-    },
-    (error) => {
-      if (onError) onError(error);
-      handleFirestoreError(error, OperationType.GET, COLLECTIONS.SERVICES);
-    }
-  );
+    });
+
+  const interval = setInterval(async () => {
+    try {
+      const data = await fetchServices();
+      if (active) onSuccess(data);
+    } catch (e) {}
+  }, 10000);
+
+  return () => {
+    active = false;
+    clearInterval(interval);
+  };
 }
 
 export async function saveService(service: Service): Promise<void> {
-  const path = `${COLLECTIONS.SERVICES}/${service.id}`;
-  try {
-    await setDoc(doc(db, COLLECTIONS.SERVICES, service.id), {
-      ...service,
-      updatedAt: new Date().toISOString()
-    });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+  const res = await fetch('/api/services', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(service),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to save service');
   }
 }
 
 // ----------------- Pricing Plans API -----------------
 
+export async function fetchPricing(): Promise<PricingPlan[]> {
+  try {
+    const res = await fetch('/api/pricing');
+    if (!res.ok) return DEFAULT_PRICING;
+    const data = await res.json();
+    return data && data.length > 0 ? data : DEFAULT_PRICING;
+  } catch (err) {
+    return DEFAULT_PRICING;
+  }
+}
+
 export function subscribeToPricing(
   onSuccess: (plans: PricingPlan[]) => void,
   onError?: (error: unknown) => void
 ) {
-  const q = query(collection(db, COLLECTIONS.PRICING), orderBy('order', 'asc'));
-  return onSnapshot(
-    q,
-    (snapshot) => {
-      if (snapshot.empty) {
+  let active = true;
+  fetchPricing()
+    .then((plans) => {
+      if (active) onSuccess(plans);
+    })
+    .catch((err) => {
+      if (active) {
+        if (onError) onError(err);
         onSuccess(DEFAULT_PRICING);
-        return;
       }
-      const items: PricingPlan[] = [];
-      snapshot.forEach((doc) => {
-        items.push(doc.data() as PricingPlan);
-      });
-      onSuccess(items);
-    },
-    (error) => {
-      if (onError) onError(error);
-      handleFirestoreError(error, OperationType.GET, COLLECTIONS.PRICING);
-    }
-  );
+    });
+
+  const interval = setInterval(async () => {
+    try {
+      const data = await fetchPricing();
+      if (active) onSuccess(data);
+    } catch (e) {}
+  }, 10000);
+
+  return () => {
+    active = false;
+    clearInterval(interval);
+  };
 }
 
 export async function savePricingPlan(plan: PricingPlan): Promise<void> {
-  const path = `${COLLECTIONS.PRICING}/${plan.id}`;
-  try {
-    await setDoc(doc(db, COLLECTIONS.PRICING, plan.id), {
-      ...plan,
-      updatedAt: new Date().toISOString()
-    });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+  const res = await fetch('/api/pricing', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(plan),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to save pricing plan');
   }
 }
 
 // ----------------- Testimonials API -----------------
 
+export async function fetchTestimonials(): Promise<Testimonial[]> {
+  try {
+    const res = await fetch('/api/testimonials');
+    if (!res.ok) return DEFAULT_TESTIMONIALS;
+    const data = await res.json();
+    return data && data.length > 0 ? data : DEFAULT_TESTIMONIALS;
+  } catch (err) {
+    return DEFAULT_TESTIMONIALS;
+  }
+}
+
 export function subscribeToTestimonials(
   onSuccess: (items: Testimonial[]) => void,
   onError?: (error: unknown) => void
 ) {
-  const q = query(collection(db, COLLECTIONS.TESTIMONIALS), orderBy('order', 'asc'));
-  return onSnapshot(
-    q,
-    (snapshot) => {
-      if (snapshot.empty) {
+  let active = true;
+  fetchTestimonials()
+    .then((items) => {
+      if (active) onSuccess(items);
+    })
+    .catch((err) => {
+      if (active) {
+        if (onError) onError(err);
         onSuccess(DEFAULT_TESTIMONIALS);
-        return;
       }
-      const items: Testimonial[] = [];
-      snapshot.forEach((doc) => {
-        items.push(doc.data() as Testimonial);
-      });
-      onSuccess(items);
-    },
-    (error) => {
-      if (onError) onError(error);
-      handleFirestoreError(error, OperationType.GET, COLLECTIONS.TESTIMONIALS);
-    }
-  );
+    });
+
+  const interval = setInterval(async () => {
+    try {
+      const data = await fetchTestimonials();
+      if (active) onSuccess(data);
+    } catch (e) {}
+  }, 10000);
+
+  return () => {
+    active = false;
+    clearInterval(interval);
+  };
 }
 
 export async function saveTestimonial(testimonial: Testimonial): Promise<void> {
-  const path = `${COLLECTIONS.TESTIMONIALS}/${testimonial.id}`;
-  try {
-    await setDoc(doc(db, COLLECTIONS.TESTIMONIALS, testimonial.id), {
-      ...testimonial,
-      updatedAt: new Date().toISOString()
-    });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+  const res = await fetch('/api/testimonials', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(testimonial),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to save testimonial');
   }
 }
 
 export async function deleteTestimonial(id: string): Promise<void> {
-  const path = `${COLLECTIONS.TESTIMONIALS}/${id}`;
-  try {
-    await deleteDoc(doc(db, COLLECTIONS.TESTIMONIALS, id));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
+  const res = await fetch(`/api/testimonials/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to delete testimonial');
   }
 }
 
 // ----------------- FAQs API -----------------
 
+export async function fetchFaqs(): Promise<FaqItem[]> {
+  try {
+    const res = await fetch('/api/faqs');
+    if (!res.ok) return DEFAULT_FAQS.map((f, i) => ({ id: `faq-${i + 1}`, ...f, order: i + 1 }));
+    const data = await res.json();
+    return data && data.length > 0 ? data : DEFAULT_FAQS.map((f, i) => ({ id: `faq-${i + 1}`, ...f, order: i + 1 }));
+  } catch (err) {
+    return DEFAULT_FAQS.map((f, i) => ({ id: `faq-${i + 1}`, ...f, order: i + 1 }));
+  }
+}
+
 export function subscribeToFaqs(
   onSuccess: (items: FaqItem[]) => void,
   onError?: (error: unknown) => void
 ) {
-  const q = query(collection(db, COLLECTIONS.FAQS), orderBy('order', 'asc'));
-  return onSnapshot(
-    q,
-    (snapshot) => {
-      if (snapshot.empty) {
-        onSuccess(DEFAULT_FAQS.map((f, i) => ({ id: `faq-${i+1}`, ...f, order: i+1 })));
-        return;
+  let active = true;
+  fetchFaqs()
+    .then((items) => {
+      if (active) onSuccess(items);
+    })
+    .catch((err) => {
+      if (active) {
+        if (onError) onError(err);
+        onSuccess(DEFAULT_FAQS.map((f, i) => ({ id: `faq-${i + 1}`, ...f, order: i + 1 })));
       }
-      const items: FaqItem[] = [];
-      snapshot.forEach((doc) => {
-        items.push(doc.data() as FaqItem);
-      });
-      onSuccess(items);
-    },
-    (error) => {
-      if (onError) onError(error);
-      handleFirestoreError(error, OperationType.GET, COLLECTIONS.FAQS);
-    }
-  );
+    });
+
+  const interval = setInterval(async () => {
+    try {
+      const data = await fetchFaqs();
+      if (active) onSuccess(data);
+    } catch (e) {}
+  }, 10000);
+
+  return () => {
+    active = false;
+    clearInterval(interval);
+  };
 }
 
 export async function saveFaq(faq: FaqItem): Promise<void> {
-  const id = faq.id || `faq-${Date.now()}`;
-  const path = `${COLLECTIONS.FAQS}/${id}`;
-  try {
-    await setDoc(doc(db, COLLECTIONS.FAQS, id), {
-      ...faq,
-      id,
-      updatedAt: new Date().toISOString()
-    });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+  const res = await fetch('/api/faqs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(faq),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to save FAQ');
   }
 }
 
 export async function deleteFaq(id: string): Promise<void> {
-  const path = `${COLLECTIONS.FAQS}/${id}`;
-  try {
-    await deleteDoc(doc(db, COLLECTIONS.FAQS, id));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
+  const res = await fetch(`/api/faqs/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to delete FAQ');
   }
 }
 
 // ----------------- Site Settings / Profile API -----------------
 
+export async function fetchSiteProfile(): Promise<SiteProfile> {
+  try {
+    const res = await fetch('/api/settings/profile');
+    if (!res.ok) return DEFAULT_PROFILE;
+    const data = await res.json();
+    return data && data.brandName ? data : DEFAULT_PROFILE;
+  } catch (err) {
+    return DEFAULT_PROFILE;
+  }
+}
+
 export function subscribeToSiteProfile(
   onSuccess: (profile: SiteProfile) => void,
   onError?: (error: unknown) => void
 ) {
-  return onSnapshot(
-    doc(db, COLLECTIONS.SETTINGS, 'profile'),
-    (snapshot) => {
-      if (!snapshot.exists()) {
+  let active = true;
+  fetchSiteProfile()
+    .then((profile) => {
+      if (active) onSuccess(profile);
+    })
+    .catch((err) => {
+      if (active) {
+        if (onError) onError(err);
         onSuccess(DEFAULT_PROFILE);
-        return;
       }
-      onSuccess(snapshot.data() as SiteProfile);
-    },
-    (error) => {
-      if (onError) onError(error);
-      handleFirestoreError(error, OperationType.GET, `${COLLECTIONS.SETTINGS}/profile`);
-    }
-  );
+    });
+
+  const interval = setInterval(async () => {
+    try {
+      const data = await fetchSiteProfile();
+      if (active) onSuccess(data);
+    } catch (e) {}
+  }, 10000);
+
+  return () => {
+    active = false;
+    clearInterval(interval);
+  };
 }
 
 export async function saveSiteProfile(profile: Partial<SiteProfile>): Promise<void> {
-  const path = `${COLLECTIONS.SETTINGS}/profile`;
-  try {
-    await setDoc(doc(db, COLLECTIONS.SETTINGS, 'profile'), {
-      ...profile,
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+  const res = await fetch('/api/settings/profile', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(profile),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to save profile');
   }
 }

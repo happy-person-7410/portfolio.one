@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Mail, Key, ShieldCheck, AlertCircle, ArrowLeft, Chrome, Sparkles } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, isOwner } from '../../context/AuthContext';
 
 interface AdminLoginProps {
   onBackToSite: () => void;
@@ -23,9 +23,15 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onBackToSite }) => {
       return;
     }
 
-    if (email.trim().toLowerCase() !== ownerEmail.toLowerCase()) {
-      setLocalError(`Access restricted. Only the site owner (${ownerEmail}) can access this admin panel.`);
-      return;
+    if (isRegisterMode) {
+      if (password.length < 8) {
+        setLocalError('Password must be at least 8 characters long.');
+        return;
+      }
+      if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+        setLocalError('Password must contain both letters and numbers.');
+        return;
+      }
     }
 
     setLoading(true);

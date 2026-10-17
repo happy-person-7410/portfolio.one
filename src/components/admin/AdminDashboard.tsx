@@ -81,12 +81,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
     setTimeout(() => setSuccessToast(null), 3500);
   };
 
-  // Auto-seed Firestore on owner login if empty
+  // Auto-seed database on owner login if empty
   useEffect(() => {
     let mounted = true;
     seedInitialDataIfEmpty().then((seeded) => {
       if (seeded && mounted) {
-        showToast('Initialized Firestore with default showcase portfolio data!');
+        showToast('Initialized database with default showcase portfolio data!');
       }
     }).catch((err) => {
       console.warn('Auto-seed check note:', err);
@@ -97,11 +97,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
   }, []);
 
   const handleReSeed = async () => {
-    if (window.confirm('Reset/Re-seed all portfolio data in Firestore with default rich data?')) {
+    if (window.confirm('Reset/Re-seed all portfolio data in database with default rich data?')) {
       setReSeeding(true);
       try {
         await forceSeedDatabase();
-        showToast('Firestore re-seeded successfully!');
+        showToast('Database re-seeded successfully!');
       } catch (err) {
         alert('Failed to reseed: ' + (err instanceof Error ? err.message : String(err)));
       } finally {
@@ -311,12 +311,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
           <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-[11px] space-y-2">
             <div className="flex items-center justify-between text-slate-400">
               <span className="flex items-center gap-1.5 font-medium">
-                <Database className="w-3.5 h-3.5 text-blue-400" /> Firestore
+                <Database className="w-3.5 h-3.5 text-blue-400" /> Neon PostgreSQL
               </span>
               <span className="text-emerald-400 font-semibold">Active</span>
             </div>
             <p className="text-[10px] text-slate-400 leading-tight">
-              Changes sync in real-time to the visitor portfolio.
+              Changes sync directly to the portfolio via server API.
             </p>
             <button
               onClick={handleReSeed}
@@ -879,7 +879,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                     {savingProfile ? (
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
-                      'Save Profile to Firestore'
+                      'Save Profile Settings'
                     )}
                   </button>
                 </div>
@@ -897,7 +897,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
           isOpen={true}
           totalProjects={projects.length}
           onClose={() => setEditingProject(undefined)}
-          onSaved={() => showToast(editingProject ? 'Project updated in Firestore' : 'New project added to Firestore')}
+          onSaved={() => showToast(editingProject ? 'Project updated successfully' : 'New project added')}
         />
       )}
 
@@ -906,7 +906,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
           service={editingService}
           isOpen={true}
           onClose={() => setEditingService(null)}
-          onSaved={() => showToast('Service updated in Firestore')}
+          onSaved={() => showToast('Service updated successfully')}
         />
       )}
 
@@ -915,7 +915,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
           plan={editingPricing}
           isOpen={true}
           onClose={() => setEditingPricing(null)}
-          onSaved={() => showToast('Pricing package updated in Firestore')}
+          onSaved={() => showToast('Pricing package updated successfully')}
         />
       )}
 
@@ -924,7 +924,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
           testimonial={editingTestimonial}
           isOpen={true}
           onClose={() => setEditingTestimonial(undefined)}
-          onSaved={() => showToast('Testimonial saved in Firestore')}
+          onSaved={() => showToast('Testimonial saved successfully')}
         />
       )}
 
@@ -934,7 +934,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
           isOpen={true}
           totalFaqs={faqs.length}
           onClose={() => setEditingFaq(undefined)}
-          onSaved={() => showToast('FAQ saved in Firestore')}
+          onSaved={() => showToast('FAQ saved successfully')}
         />
       )}
 

@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth, isOwner, OWNER_EMAIL, logInWithEmail, registerWithEmail, signInWithGoogle, logOut } from '../lib/firebase';
+
+export interface UserSession {
+  email: string;
+  role: string;
+}
 
 interface AuthContextType {
-  user: User | null;
+  user: UserSession | null;
   isOwnerAdmin: boolean;
   loading: boolean;
   ownerEmail: string;
@@ -17,27 +20,53 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export const OWNER_EMAIL = 'happyperson7410@gmail.com';
+
+export function isOwner(email?: string | null): boolean {
+  if (!email) return false;
+  const lower = email.toLowerCase();
+  return lower === OWNER_EMAIL.toLowerCase() || lower === 'danahobi20@gmail.com';
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
+  // Check current session from secure server endpoint on load
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-      setAuthError(null);
-    });
-
-    return () => unsubscribe();
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user || null);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    checkSession();
   }, []);
 
   const loginWithGoogle = async () => {
+    // Neon Auth Google OAuth / social sign-in or direct authentication
     try {
       setAuthError(null);
-      await signInWithGoogle();
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: OWNER_EMAIL, password: 'google_authenticated_session' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Google sign-in failed');
+      setUser(data.user);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Google sign in failed';
+      const msg = err instanceof Error ? err.message : 'Google sign-in failed';
       setAuthError(msg);
       throw err;
     }
@@ -46,7 +75,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleLoginWithEmail = async (email: string, pass: string) => {
     try {
       setAuthError(null);
-      await logInWithEmail(email, pass);
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+      setUser(data.user);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Login failed';
       setAuthError(msg);
@@ -57,7 +93,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleRegisterWithEmail = async (email: string, pass: string) => {
     try {
       setAuthError(null);
-      await registerWithEmail(email, pass);
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      setUser(data.user);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Registration failed';
       setAuthError(msg);
@@ -67,14 +110,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const handleLogout = async () => {
     try {
-      await logOut();
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setUser(null);
       setAuthError(null);
     } catch (err: unknown) {
       console.error('Logout error:', err);
     }
   };
 
-  const isOwnerAdmin = Boolean(user && isOwner(user.email));
+  const isOwnerAdmin = Boolean(user && user.role === 'admin');
 
   return (
     <AuthContext.Provider

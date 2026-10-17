@@ -362,7 +362,7 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
                 type="text"
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
-                placeholder="React, TypeScript, Tailwind CSS, Firebase"
+                placeholder="React, TypeScript, Tailwind CSS, PostgreSQL, Neon"
                 className="w-full px-3.5 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

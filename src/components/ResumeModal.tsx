@@ -26,7 +26,7 @@ Happy Person is an independent creative brand and frontend studio crafting moder
 ## Core Technical & Design Competencies
 - Frontend & UI: React, TypeScript, JavaScript (ES6+), HTML5, Tailwind CSS, Motion, Component Systems, WCAG AA Accessibility
 - Prototyping & AI: Google AI Studio, Figma, Gemini API rapid prototyping
-- Backend & Integrations: Node.js, Express, Firebase Firestore, Supabase, Calendar APIs, Stripe Checkout
+- Backend & Integrations: Node.js, Express, Neon PostgreSQL, Neon Object Storage, REST APIs, Calendar APIs, Stripe Checkout
 - DevOps & Deployment: Git, GitHub, Vite, Vercel, Netlify, Cloud Run
 
 ## Selected Production Deliverables
@@ -160,7 +160,7 @@ Independent Creative Studio (2022 - Present)
               </div>
               <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#131b2e] border border-neutral-200/80 dark:border-[#1e293b]">
                 <span className="font-semibold block text-neutral-900 dark:text-white mb-1">Modern AI & Tooling</span>
-                <span className="text-neutral-600 dark:text-neutral-400">Google AI Studio Prototyping, Git, Vite, Firebase, Supabase, Calendar APIs, High-Performance Hosting</span>
+                <span className="text-neutral-600 dark:text-neutral-400">Google AI Studio Prototyping, Git, Vite, Neon PostgreSQL, Object Storage, Calendar APIs, High-Performance Hosting</span>
               </div>
             </div>
           </div>

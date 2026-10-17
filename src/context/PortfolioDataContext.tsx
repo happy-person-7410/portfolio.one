@@ -6,7 +6,7 @@ import {
   PRICING_PLANS as DEFAULT_PRICING,
   TESTIMONIALS as DEFAULT_TESTIMONIALS,
   FAQ_ITEMS as DEFAULT_FAQS,
-  PROFILE_INFO as DEFAULT_PROFILE
+  PROFILE_INFO as DEFAULT_PROFILE,
 } from '../data/portfolioData';
 import {
   subscribeToProjects,
@@ -15,9 +15,7 @@ import {
   subscribeToTestimonials,
   subscribeToFaqs,
   subscribeToSiteProfile,
-  seedInitialDataIfEmpty
 } from '../services/portfolioService';
-import { testConnection } from '../lib/firebase';
 
 interface PortfolioDataContextType {
   projects: Project[];
@@ -37,7 +35,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [services, setServices] = useState<Service[]>(DEFAULT_SERVICES);
   const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>(DEFAULT_PRICING);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
-  const [faqs, setFaqs] = useState<FaqItem[]>(DEFAULT_FAQS.map((f, i) => ({ id: `faq-${i+1}`, ...f, order: i+1 })));
+  const [faqs, setFaqs] = useState<FaqItem[]>(DEFAULT_FAQS.map((f, i) => ({ id: `faq-${i + 1}`, ...f, order: i + 1 })));
   const [profile, setProfile] = useState<SiteProfile>(DEFAULT_PROFILE);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
@@ -47,8 +45,8 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const initializeData = async () => {
       try {
-        const connected = await testConnection();
-        setIsOnline(connected);
+        const healthRes = await fetch('/api/health').catch(() => null);
+        setIsOnline(Boolean(healthRes && healthRes.ok));
 
         // 1. Projects subscription
         const unsubProjects = subscribeToProjects(
@@ -59,7 +57,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setIsLoading(false);
           },
           (err) => {
-            console.warn('Projects snapshot error, using default state:', err);
+            console.warn('Projects fetch warning, using defaults:', err);
             setIsLoading(false);
           }
         );
@@ -70,7 +68,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
           (items) => {
             if (items && items.length > 0) setServices(items);
           },
-          (err) => console.warn('Services snapshot error:', err)
+          (err) => console.warn('Services fetch warning:', err)
         );
         unsubs.push(unsubServices);
 
@@ -79,7 +77,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
           (items) => {
             if (items && items.length > 0) setPricingPlans(items);
           },
-          (err) => console.warn('Pricing snapshot error:', err)
+          (err) => console.warn('Pricing fetch warning:', err)
         );
         unsubs.push(unsubPricing);
 
@@ -88,7 +86,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
           (items) => {
             if (items && items.length > 0) setTestimonials(items);
           },
-          (err) => console.warn('Testimonials snapshot error:', err)
+          (err) => console.warn('Testimonials fetch warning:', err)
         );
         unsubs.push(unsubTestimonials);
 
@@ -97,7 +95,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
           (items) => {
             if (items && items.length > 0) setFaqs(items);
           },
-          (err) => console.warn('FAQs snapshot error:', err)
+          (err) => console.warn('FAQs fetch warning:', err)
         );
         unsubs.push(unsubFaqs);
 
@@ -106,12 +104,12 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
           (item) => {
             if (item) setProfile(item);
           },
-          (err) => console.warn('Profile snapshot error:', err)
+          (err) => console.warn('Profile fetch warning:', err)
         );
         unsubs.push(unsubProfile);
 
       } catch (err) {
-        console.warn('Error connecting to Firebase:', err);
+        console.warn('Error loading portfolio data:', err);
         setIsLoading(false);
       }
     };
@@ -133,7 +131,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
         faqs,
         profile,
         isLoading,
-        isOnline
+        isOnline,
       }}
     >
       {children}
