@@ -89,7 +89,7 @@ export const CREATIVE_ITEMS: CreativeItem[] = [
     thumbnail: "/src/assets/images/saas_dashboard_mockup_1792086720504.jpg",
     fullImage: "/src/assets/images/saas_dashboard_mockup_1792086720504.jpg",
     toolsUsed: ["UI Layout", "3D Elevation", "Gradient Glows"],
-    deliverables: ["Twitter/X Header (1500x500)", "LinkedIn Company Cover (1584x396)", "Product Hunt hero banner", "Retina preview mockups"]
+    deliverables: ["Twitter/X Header (1500x500)", "Professional Company Cover (1584x396)", "Product Hunt hero banner", "Retina preview mockups"]
   },
   {
     id: "banner-happy-studio",

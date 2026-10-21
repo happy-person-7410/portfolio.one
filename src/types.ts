@@ -16,7 +16,6 @@ export interface Project {
   thumbnail: string;
   previewVideoUrl?: string;
   liveDemoUrl: string;
-  githubUrl?: string;
   problem: string;
   solution: string;
   features: string[];

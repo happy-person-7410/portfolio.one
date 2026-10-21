@@ -20,6 +20,7 @@ interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectProject: (project: Project) => void;
+  initialTab?: 'overview' | 'interactive' | 'gallery';
 }
 
 export const ProjectModal: React.FC<ProjectModalProps> = ({
@@ -28,9 +29,10 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
   isOpen,
   onClose,
   onSelectProject,
+  initialTab = 'overview',
 }) => {
   const { profile } = usePortfolioData();
-  const [activeTab, setActiveTab] = useState<'overview' | 'interactive' | 'gallery'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'interactive' | 'gallery'>(initialTab);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -44,10 +46,10 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, project]);
 
-  // Reset tab when project changes
+  // Sync tab when initialTab or project changes
   useEffect(() => {
-    setActiveTab('overview');
-  }, [project?.id]);
+    setActiveTab(initialTab);
+  }, [project?.id, initialTab]);
 
   if (!isOpen || !project) return null;
 

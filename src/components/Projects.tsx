@@ -11,6 +11,7 @@ export const Projects: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalInitialTab, setModalInitialTab] = useState<'overview' | 'interactive' | 'gallery'>('overview');
 
   const categories: string[] = [
     'All',
@@ -63,8 +64,9 @@ export const Projects: React.FC = () => {
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, [visibleProjects, isModalOpen]);
 
-  const handleOpenDetails = (project: Project) => {
+  const handleOpenDetails = (project: Project, tab: 'overview' | 'interactive' | 'gallery' = 'overview') => {
     setActiveProject(project);
+    setModalInitialTab(tab);
     setIsModalOpen(true);
     // Push clean URL to browser history
     window.history.pushState({ projectId: project.id }, '', `/work/${project.id}`);
@@ -231,16 +233,28 @@ export const Projects: React.FC = () => {
                     <span>View Details</span>
                   </button>
 
-                  <div className="flex items-center gap-2">
-                    <a
-                      href={project.liveDemoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDetails(project, 'interactive')}
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all cursor-pointer shadow-xs active:scale-95 hover:-translate-y-0.5"
+                      title="Open interactive prototype live demo"
                     >
+                      <Laptop className="w-3.5 h-3.5" />
                       <span>View Live Demo</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                    </button>
+                    {project.liveDemoUrl && (
+                      <a
+                        href={project.liveDemoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                        title={`Open ${project.title} external live website`}
+                        aria-label={`Open ${project.title} external live website in new tab`}
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -259,6 +273,7 @@ export const Projects: React.FC = () => {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSelectProject={handleSelectModalProject}
+        initialTab={modalInitialTab}
       />
     </section>
   );

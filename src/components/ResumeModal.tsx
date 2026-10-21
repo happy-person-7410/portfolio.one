@@ -18,7 +18,7 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
 
   const handleDownload = () => {
     const resumeText = `# Happy Person - Independent Creative Web & UI Studio
-${profile.location || PROFILE_INFO.location} | ${profile.email || PROFILE_INFO.email} | WhatsApp: ${profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl}
+${profile.location || PROFILE_INFO.location} | Messenger: ${profile.messengerUrl || CONTACT_CONFIG.messengerUrl} | WhatsApp: ${profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl} | Email: ${profile.email || PROFILE_INFO.email}
 
 ## Studio Profile
 Happy Person is an independent creative brand and frontend studio crafting modern, high-converting websites, appointment booking portals, and SaaS dashboards with Google AI Studio, React, TypeScript, and Tailwind CSS.
@@ -130,14 +130,29 @@ Independent Creative Studio (2022 - Present)
               <div className="flex flex-wrap gap-3 text-xs text-neutral-500 dark:text-neutral-400 mt-2">
                 <span>{profile.location || PROFILE_INFO.location}</span>
                 <span>·</span>
-                <span>{profile.email || PROFILE_INFO.email}</span>
+                <a
+                  href={profile.messengerUrl || CONTACT_CONFIG.messengerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline transition-colors cursor-pointer"
+                >
+                  Messenger
+                </a>
+                <span>·</span>
                 <a
                   href={profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-emerald-500 transition-colors cursor-pointer"
+                  className="font-medium text-emerald-600 dark:text-emerald-400 hover:underline transition-colors cursor-pointer"
                 >
-                  WhatsApp Chat
+                  WhatsApp
+                </a>
+                <span>·</span>
+                <a
+                  href={`mailto:${profile.email || PROFILE_INFO.email}`}
+                  className="hover:underline transition-colors cursor-pointer"
+                >
+                  {profile.email || PROFILE_INFO.email}
                 </a>
               </div>
             </div>
