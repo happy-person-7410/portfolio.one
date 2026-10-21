@@ -105,7 +105,7 @@ export const About: React.FC = () => {
 
         {/* 4 Quick Facts Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PROFILE_INFO.quickFacts.map((fact, index) => {
+          {(profile?.quickFacts || PROFILE_INFO.quickFacts || []).map((fact: { label: string; title: string; desc: string }, index: number) => {
             const Icon = factIcons[index % factIcons.length];
             return (
               <div 

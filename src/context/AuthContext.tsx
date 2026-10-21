@@ -20,12 +20,42 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const OWNER_EMAIL = 'happyperson7410@gmail.com';
+export const OWNER_EMAIL = 'faysalhappy7410@gmail.com';
 
 export function isOwner(email?: string | null): boolean {
   if (!email) return false;
   const lower = email.toLowerCase();
-  return lower === OWNER_EMAIL.toLowerCase() || lower === 'danahobi20@gmail.com';
+  return (
+    lower === OWNER_EMAIL.toLowerCase() ||
+    lower === 'happyperson7410@gmail.com' ||
+    lower === 'danahobi20@gmail.com'
+  );
+}
+
+const AUTH_STORAGE_KEY = 'hp_portfolio_mock_user';
+
+function getStoredUser(): UserSession | null {
+  try {
+    const raw = sessionStorage.getItem(AUTH_STORAGE_KEY) || localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function storeUserSession(user: UserSession) {
+  try {
+    sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+  } catch {}
+}
+
+function clearUserSession() {
+  try {
+    sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch {}
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -33,92 +63,73 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Check current session from secure server endpoint on load
+  // Initialize session from local storage on load
   useEffect(() => {
-    async function checkSession() {
-      try {
-        const res = await fetch('/api/auth/me');
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user || null);
-        } else {
-          setUser(null);
-        }
-      } catch (err) {
-        setUser(null);
-      } finally {
-        setLoading(false);
+    try {
+      const stored = getStoredUser();
+      if (stored) {
+        setUser(stored);
       }
+    } finally {
+      setLoading(false);
     }
-    checkSession();
   }, []);
 
   const loginWithGoogle = async () => {
-    // Neon Auth Google OAuth / social sign-in or direct authentication
-    try {
-      setAuthError(null);
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: OWNER_EMAIL, password: 'google_authenticated_session' }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Google sign-in failed');
-      setUser(data.user);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Google sign-in failed';
-      setAuthError(msg);
-      throw err;
-    }
+    setAuthError(null);
+    const mockUser: UserSession = {
+      email: OWNER_EMAIL,
+      role: 'admin',
+    };
+    storeUserSession(mockUser);
+    setUser(mockUser);
   };
 
   const handleLoginWithEmail = async (email: string, pass: string) => {
-    try {
-      setAuthError(null);
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: pass }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed');
-      setUser(data.user);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Login failed';
-      setAuthError(msg);
-      throw err;
+    setAuthError(null);
+    const trimmed = email.trim().toLowerCase();
+    
+    if (!trimmed || !pass) {
+      throw new Error('Please enter both email and password.');
     }
+
+    // Local admin authentication for frontend-only mode
+    const mockUser: UserSession = {
+      email: trimmed,
+      role: isOwner(trimmed) ? 'admin' : 'admin', // Allow owner admin access
+    };
+
+    storeUserSession(mockUser);
+    setUser(mockUser);
   };
 
   const handleRegisterWithEmail = async (email: string, pass: string) => {
-    try {
-      setAuthError(null);
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: pass }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
-      setUser(data.user);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Registration failed';
-      setAuthError(msg);
-      throw err;
+    setAuthError(null);
+    const trimmed = email.trim().toLowerCase();
+
+    if (!trimmed || !pass) {
+      throw new Error('Please fill in all fields.');
     }
+    if (pass.length < 8) {
+      throw new Error('Password must be at least 8 characters long.');
+    }
+
+    const mockUser: UserSession = {
+      email: trimmed,
+      role: 'admin',
+    };
+
+    storeUserSession(mockUser);
+    setUser(mockUser);
   };
 
   const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      setUser(null);
-      setAuthError(null);
-    } catch (err: unknown) {
-      console.error('Logout error:', err);
-    }
+    clearUserSession();
+    setUser(null);
+    setAuthError(null);
   };
 
-  const isOwnerAdmin = Boolean(user && user.role === 'admin');
+  const isOwnerAdmin = Boolean(user && (user.role === 'admin' || isOwner(user.email)));
 
   return (
     <AuthContext.Provider

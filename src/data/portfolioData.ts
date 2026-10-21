@@ -1,6 +1,9 @@
-import { Project, Service, Testimonial, PricingPlan, FaqItem } from '../types';
+import { Project, Service, Testimonial, PricingPlan, FaqItem, SiteProfile } from '../types';
+import { CONTACT_CONFIG } from './contactConfig';
 
-export const PROFILE_INFO = {
+export { CONTACT_CONFIG };
+
+export const PROFILE_INFO: SiteProfile = {
   name: "Happy Person",
   brandName: "Happy Person",
   studioType: "Independent Creative Web & UI Studio",
@@ -10,19 +13,21 @@ export const PROFILE_INFO = {
   subheading: "Custom web design, responsive websites, booking systems, dashboards, and AI-powered web app UIs by Happy Person.",
   avatar: "/src/assets/images/happy_person_mascot_1792166218374.jpg",
   ogBanner: "/src/assets/images/happy_person_banner_1792166219172.jpg",
-  bio: "Hello! I'm Happy Person—an independent creative web designer and frontend developer represented by a friendly, reliable studio mascot. I specialize in turning business ideas into clean, fast, and high-converting digital experiences. Using Google AI Studio, React, TypeScript, and modern styling, I build everything from local service landing pages and appointment booking systems to high-utility SaaS dashboards. I bring a friendly, playful creative touch backed by rigorous engineering and clear, reliable communication.",
-  email: "hello@happyperson.dev",
-  phone: "+1 (555) 349-2810",
-  whatsapp: "+15553492810",
-  messengerUrl: "https://m.me/happyperson.dev",
+  bio: "Hello! I'm Happy Person—an independent creative web designer and frontend developer represented by a friendly, reliable studio mascot. I specialize in turning business ideas into clean, fast, and high-converting digital experiences. Using modern React, TypeScript, and styling, I build everything from local service landing pages and appointment booking systems to high-utility SaaS dashboards. I bring a friendly, playful creative touch backed by rigorous engineering and clear, reliable communication.",
+  email: CONTACT_CONFIG.email,
+  phone: CONTACT_CONFIG.whatsAppNumber,
+  whatsappNumber: CONTACT_CONFIG.whatsAppNumber,
+  whatsappUrl: CONTACT_CONFIG.whatsAppUrl,
+  facebookPageUrl: CONTACT_CONFIG.facebookPageUrl,
+  messengerUrl: CONTACT_CONFIG.messengerUrl,
+  whatsapp: CONTACT_CONFIG.whatsAppNumber,
   location: "Independent Studio · Remote Worldwide",
   availability: "Available for Q4 / Q1 Projects",
   socials: {
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    facebook: "https://facebook.com",
-    whatsapp: "https://wa.me/15553492810",
-    messenger: "https://m.me/happyperson.dev"
+    facebook: CONTACT_CONFIG.facebookPageUrl,
+    whatsapp: CONTACT_CONFIG.whatsAppUrl,
+    messenger: CONTACT_CONFIG.messengerUrl,
+    email: `mailto:${CONTACT_CONFIG.email}`,
   },
   skills: [
     "Google AI Studio",
@@ -469,64 +474,7 @@ export const TESTIMONIALS: Testimonial[] = [
   }
 ];
 
-export const PRICING_PLANS: PricingPlan[] = [
-  {
-    id: "basic-landing",
-    name: "Basic Landing Page",
-    price: "$499",
-    subtitle: "Ideal for product launches, lead generation, and local promotions needing fast turnaround.",
-    turnaroundTime: "3 to 5 business days",
-    serviceCategory: "Landing Page Design",
-    isRecommended: false,
-    features: [
-      "Custom single-page high-converting layout",
-      "Mobile-first responsive design on all devices",
-      "Contact & lead capture form with email alerts",
-      "Basic SEO meta tags and social media cards",
-      "Google AI Studio rapid UI turnaround",
-      "Free hosting setup on Vercel / Netlify",
-      "14 days post-launch support"
-    ]
-  },
-  {
-    id: "business-website",
-    name: "Business Website",
-    price: "$999",
-    subtitle: "Complete multi-page website for established businesses and service companies seeking growth.",
-    turnaroundTime: "1 to 2 weeks",
-    serviceCategory: "Website Design & Development",
-    isRecommended: true,
-    features: [
-      "Up to 5 custom-designed pages (Home, About, Services, Gallery, Contact)",
-      "Interactive service showcase & customer testimonials",
-      "Advanced local SEO & Google Analytics integration",
-      "Fast page load speed guarantee (<1.5s)",
-      "Interactive quote or consultation request forms",
-      "Content Management or easily editable data structure",
-      "Domain DNS connection & SSL security certificate",
-      "30 days post-launch warranty support"
-    ]
-  },
-  {
-    id: "custom-app",
-    name: "Custom Web App / Booking",
-    price: "$1,899",
-    subtitle: "Advanced functional web application, booking portal, e-commerce, or SaaS dashboard UI.",
-    turnaroundTime: "2 to 4 weeks",
-    serviceCategory: "Booking & Appointment Website",
-    isRecommended: false,
-    features: [
-      "Full interactive booking calendar or SaaS dashboard UI",
-      "Database integration with Neon PostgreSQL or Supabase",
-      "User authentication & profile management capabilities",
-      "Payment processing preview or Stripe integration",
-      "Custom admin views and data filtering controls",
-      "Comprehensive TypeScript codebase with component docs",
-      "Priority revisions & dedicated Slack communication",
-      "60 days post-launch support & handover call"
-    ]
-  }
-];
+export { PRICING_PLANS, ADDON_SERVICES, PRICING_DISCLAIMER_NOTE } from './pricingData';
 
 export const FAQ_ITEMS: FaqItem[] = [
   {

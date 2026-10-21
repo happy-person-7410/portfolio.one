@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { 
   X, 
   ExternalLink, 
-  Github, 
   ChevronLeft, 
   ChevronRight, 
   CheckCircle2, 
@@ -12,6 +11,8 @@ import {
 } from 'lucide-react';
 import { Project } from '../types';
 import { InteractiveProjectPreview } from './InteractiveProjectPreview';
+import { MessengerIcon } from './icons/MessengerIcon';
+import { usePortfolioData } from '../context/PortfolioDataContext';
 
 interface ProjectModalProps {
   project: Project | null;
@@ -28,6 +29,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
   onClose,
   onSelectProject,
 }) => {
+  const { profile } = usePortfolioData();
   const [activeTab, setActiveTab] = useState<'overview' | 'interactive' | 'gallery'>('overview');
 
   useEffect(() => {
@@ -166,17 +168,15 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
 
-                {project.githubUrl && (
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-neutral-900/90 hover:bg-neutral-800 text-white border border-neutral-700 rounded-xl text-xs font-semibold shadow-md transition-all cursor-pointer hover:-translate-y-0.5"
-                  >
-                    <Github className="w-3.5 h-3.5" />
-                    <span>Source Code</span>
-                  </a>
-                )}
+                <a
+                  href={profile.messengerUrl || 'https://m.me/happyperson7410'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#0084FF] to-[#0062E0] hover:from-[#0074E8] hover:to-[#0052C8] text-white rounded-xl text-xs font-semibold shadow-md transition-all cursor-pointer hover:-translate-y-0.5"
+                >
+                  <MessengerIcon className="w-3.5 h-3.5 fill-white" />
+                  <span>Discuss on Messenger</span>
+                </a>
               </div>
             </div>
           </div>

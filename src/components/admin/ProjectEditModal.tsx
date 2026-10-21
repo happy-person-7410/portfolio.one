@@ -38,7 +38,6 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
   const [thumbnail, setThumbnail] = useState(project?.thumbnail || PRESET_MOCKUPS[0].url);
   const [previewVideoUrl, setPreviewVideoUrl] = useState(project?.previewVideoUrl || '');
   const [liveDemoUrl, setLiveDemoUrl] = useState(project?.liveDemoUrl || '');
-  const [githubUrl, setGithubUrl] = useState(project?.githubUrl || '');
   const [problem, setProblem] = useState(project?.problem || '');
   const [solution, setSolution] = useState(project?.solution || '');
   const [tagsInput, setTagsInput] = useState(project?.tags?.join(', ') || 'React, TypeScript, Tailwind CSS');
@@ -74,7 +73,6 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
       thumbnail: thumbnail.trim(),
       previewVideoUrl: previewVideoUrl.trim() || undefined,
       liveDemoUrl: liveDemoUrl.trim(),
-      githubUrl: githubUrl.trim() || undefined,
       problem: problem.trim() || 'Legacy interface lacked conversion and mobile responsiveness.',
       solution: solution.trim() || 'Designed and developed a fast, modern digital experience.',
       tags: tags.length ? tags : ['React', 'TypeScript', 'Tailwind CSS'],
@@ -254,28 +252,16 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
               <LinkIcon className="w-3.5 h-3.5 text-blue-400" /> Links & Media Assets
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">Live Demo Link *</label>
-                <input
-                  type="url"
-                  required
-                  value={liveDemoUrl}
-                  onChange={(e) => setLiveDemoUrl(e.target.value)}
-                  placeholder="https://example.com/demo"
-                  className="w-full px-3.5 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">GitHub Repository Link (Optional)</label>
-                <input
-                  type="url"
-                  value={githubUrl}
-                  onChange={(e) => setGithubUrl(e.target.value)}
-                  placeholder="https://github.com/..."
-                  className="w-full px-3.5 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Live Demo Link *</label>
+              <input
+                type="url"
+                required
+                value={liveDemoUrl}
+                onChange={(e) => setLiveDemoUrl(e.target.value)}
+                placeholder="https://example.com/demo"
+                className="w-full px-3.5 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <div>
@@ -362,7 +348,7 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
                 type="text"
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
-                placeholder="React, TypeScript, Tailwind CSS, PostgreSQL, Neon"
+                placeholder="React, TypeScript, Tailwind CSS, UI/UX"
                 className="w-full px-3.5 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

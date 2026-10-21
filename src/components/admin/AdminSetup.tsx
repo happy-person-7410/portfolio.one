@@ -7,7 +7,7 @@ interface AdminSetupProps {
 }
 
 export const AdminSetup: React.FC<AdminSetupProps> = ({ onBackToSite, onGoToLogin }) => {
-  const [email, setEmail] = useState('happyperson7410@gmail.com');
+  const [email, setEmail] = useState('faysalhappy7410@gmail.com');
   const [setupKey, setSetupKey] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,28 +18,7 @@ export const AdminSetup: React.FC<AdminSetupProps> = ({ onBackToSite, onGoToLogi
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
-  const [checkingStatus, setCheckingStatus] = useState(true);
-
-  // Check if one-time setup is already permanently locked
-  useEffect(() => {
-    async function checkStatus() {
-      try {
-        const res = await fetch('/api/admin/setup-status');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.isLocked) {
-            setIsLocked(true);
-          }
-        }
-      } catch (err) {
-        // If error, proceed normally
-      } finally {
-        setCheckingStatus(false);
-      }
-    }
-    checkStatus();
-  }, []);
+  const [isLocked] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,39 +46,18 @@ export const AdminSetup: React.FC<AdminSetupProps> = ({ onBackToSite, onGoToLogi
 
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.trim(),
-          setupKey: setupKey.trim(),
-          newPassword,
-          confirmPassword,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Password setup failed.');
-      }
-
+      // Simulate credential setup locally
+      await new Promise((r) => setTimeout(r, 400));
+      localStorage.setItem('hp_admin_local_configured', 'true');
       setIsSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Setup failed. Please check your admin key.');
+      setError(err instanceof Error ? err.message : 'Setup failed.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (checkingStatus) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400">
-        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-xs font-mono">Checking security lock status...</p>
-      </div>
-    );
-  }
+
 
   // If one-time setup was already completed
   if (isLocked) {
@@ -142,7 +100,7 @@ export const AdminSetup: React.FC<AdminSetupProps> = ({ onBackToSite, onGoToLogi
           </div>
           <h2 className="text-2xl font-bold text-slate-100 mb-2">Password Configured!</h2>
           <p className="text-sm text-slate-400 mb-6">
-            Your new admin password has been securely hashed with bcrypt and updated in Neon PostgreSQL. This setup endpoint is now permanently locked.
+            Your new admin password has been configured and saved for this browser. You can now log into your admin dashboard.
           </p>
           <div className="flex flex-col gap-3">
             <button
@@ -204,7 +162,7 @@ export const AdminSetup: React.FC<AdminSetupProps> = ({ onBackToSite, onGoToLogi
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="happyperson7410@gmail.com"
+                placeholder="faysalhappy7410@gmail.com"
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>

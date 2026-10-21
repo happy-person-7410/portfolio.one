@@ -165,8 +165,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
     try {
       await saveSiteProfile(profileForm);
       showToast('Profile & Contact information updated in database!');
-    } catch {
-      alert('Failed to save profile');
+    } catch (err: unknown) {
+      alert('Failed to save profile: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setSavingProfile(false);
     }
@@ -307,16 +307,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
             </button>
           </nav>
 
-          {/* Bottom Database sync box */}
+          {/* Bottom Storage sync box */}
           <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-[11px] space-y-2">
             <div className="flex items-center justify-between text-slate-400">
               <span className="flex items-center gap-1.5 font-medium">
-                <Database className="w-3.5 h-3.5 text-blue-400" /> Neon PostgreSQL
+                <Database className="w-3.5 h-3.5 text-blue-400" /> Local Studio Storage
               </span>
               <span className="text-emerald-400 font-semibold">Active</span>
             </div>
             <p className="text-[10px] text-slate-400 leading-tight">
-              Changes sync directly to the portfolio via server API.
+              Changes sync instantly across public site and CMS.
             </p>
             <button
               onClick={handleReSeed}
@@ -324,7 +324,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
               className="w-full mt-2 py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
               <RefreshCw className={`w-3 h-3 ${reSeeding ? 'animate-spin' : ''}`} />
-              Re-seed Default Data
+              Reset to Default Data
             </button>
           </div>
         </aside>
@@ -403,19 +403,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                             >
                               Demo <ExternalLink className="w-2.5 h-2.5" />
                             </a>
-                            {p.githubUrl && (
-                              <>
-                                <span>•</span>
-                                <a
-                                  href={p.githubUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-slate-400 hover:text-slate-200"
-                                >
-                                  GitHub
-                                </a>
-                              </>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -798,7 +785,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                     </label>
                     <input
                       type="url"
-                      placeholder="https://m.me/happyperson.dev"
+                      placeholder="https://m.me/happyperson7410"
                       value={profileForm.messengerUrl || ''}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -819,7 +806,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                     <label className="block text-xs font-medium text-slate-300 mb-1.5">Facebook Profile / Page Link</label>
                     <input
                       type="url"
-                      placeholder="https://facebook.com/happyperson"
+                      placeholder="https://www.facebook.com/happyperson7410"
                       value={profileForm.socials?.facebook || ''}
                       onChange={(e) => setProfileForm({
                         ...profileForm,

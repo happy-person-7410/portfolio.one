@@ -43,21 +43,20 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     let unsubs: (() => void)[] = [];
 
-    const initializeData = async () => {
+    const initializeData = () => {
       try {
-        const healthRes = await fetch('/api/health').catch(() => null);
-        setIsOnline(Boolean(healthRes && healthRes.ok));
+        setIsOnline(true);
 
         // 1. Projects subscription
         const unsubProjects = subscribeToProjects(
           (items) => {
-            if (items && items.length > 0) {
+            if (items) {
               setProjects(items);
             }
             setIsLoading(false);
           },
           (err) => {
-            console.warn('Projects fetch warning, using defaults:', err);
+            console.warn('Projects local load warning:', err);
             setIsLoading(false);
           }
         );
@@ -102,7 +101,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
         // 6. Profile subscription
         const unsubProfile = subscribeToSiteProfile(
           (item) => {
-            if (item) setProfile(item);
+            if (item) setProfile((prev) => ({ ...DEFAULT_PROFILE, ...prev, ...item }));
           },
           (err) => console.warn('Profile fetch warning:', err)
         );

@@ -62,7 +62,7 @@ export default function App() {
 
   // Pre-fill state for contact form when user triggers service or pricing cards
   const [selectedService, setSelectedService] = useState<string>('Website Design & Development');
-  const [selectedBudget, setSelectedBudget] = useState<string>('$500 - $1,000');
+  const [selectedBudget, setSelectedBudget] = useState<string>('৳5,000 - ৳15,000');
 
   // Track active section for navbar indicator
   useEffect(() => {
@@ -225,11 +225,11 @@ export default function App() {
         <Pricing
           onSelectPlan={(planName, serviceCategory) => {
             const budgetMap: Record<string, string> = {
-              'Basic Landing Page': 'Under $500',
-              'Business Website': '$500 - $1,000',
-              'Custom Web App / Booking': '$1,000 - $2,500'
+              'Starter Landing Page': '৳5,000 - ৳15,000',
+              'Business Website': '৳15,000 - ৳25,000',
+              'Booking / Custom Website': '৳25,000 - ৳50,000'
             };
-            scrollToContact(serviceCategory, budgetMap[planName] || '$500 - $1,000');
+            scrollToContact(serviceCategory, budgetMap[planName] || '৳5,000 - ৳15,000');
           }}
         />
 

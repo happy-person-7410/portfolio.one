@@ -1,8 +1,8 @@
-import React from 'react';
-import { ArrowRight, Sparkles, Code2, Laptop, CalendarCheck, BarChart3, Bot, HeartHandshake, ExternalLink } from 'lucide-react';
+import { ArrowRight, Sparkles, Code2, Laptop, CalendarCheck, BarChart3, Bot, HeartHandshake, ExternalLink, MessageSquare, Facebook, Mail } from 'lucide-react';
 import { Button } from './ui/Button';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import { MessengerIcon } from './icons/MessengerIcon';
+import { CONTACT_CONFIG } from '../data/contactConfig';
 
 interface HeroProps {
   onViewWorkClick: () => void;
@@ -11,7 +11,10 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onViewWorkClick, onHireMeClick }) => {
   const { profile } = usePortfolioData();
-  const messengerLink = profile.messengerUrl || profile.socials?.messenger || 'https://m.me/happyperson.dev';
+  const messengerLink = profile.messengerUrl || CONTACT_CONFIG.messengerUrl;
+  const whatsappLink = profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl;
+  const facebookPageLink = profile.facebookPageUrl || CONTACT_CONFIG.facebookPageUrl;
+  const emailLink = `mailto:${profile.email || CONTACT_CONFIG.email}`;
   const capabilities = [
     { label: "Web UI Design", icon: Laptop },
     { label: "Responsive Websites", icon: Code2 },
@@ -62,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewWorkClick, onHireMeClick }) =>
             </p>
 
             {/* Action Buttons with Prominent Messenger CTA */}
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-10 w-full sm:w-auto">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-4 w-full sm:w-auto">
               {/* Prominent Primary Messenger Button */}
               <a
                 href={messengerLink}
@@ -97,6 +100,39 @@ export const Hero: React.FC<HeroProps> = ({ onViewWorkClick, onHireMeClick }) =>
               >
                 Start a Project
               </Button>
+            </div>
+
+            {/* Secondary Direct Channels */}
+            <div className="flex flex-wrap items-center gap-2.5 mb-10 text-xs">
+              <span className="text-neutral-500 dark:text-neutral-400 font-medium">Secondary channels:</span>
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-[#111726] hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 dark:hover:text-emerald-400 border border-neutral-200/80 dark:border-[#1e293b] shadow-2xs transition-colors"
+                title="Chat on WhatsApp"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
+                <span>WhatsApp</span>
+              </a>
+              <a
+                href={facebookPageLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-[#111726] hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 border border-neutral-200/80 dark:border-[#1e293b] shadow-2xs transition-colors"
+                title="Facebook Page"
+              >
+                <Facebook className="w-3.5 h-3.5 text-blue-500" />
+                <span>Facebook Page</span>
+              </a>
+              <a
+                href={emailLink}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-[#111726] hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white border border-neutral-200/80 dark:border-[#1e293b] shadow-2xs transition-colors"
+                title="Email Inquiry"
+              >
+                <Mail className="w-3.5 h-3.5 text-neutral-500" />
+                <span>Email</span>
+              </a>
             </div>
 
             {/* Core Capability Badges */}

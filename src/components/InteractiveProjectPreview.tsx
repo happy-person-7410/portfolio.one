@@ -34,7 +34,7 @@ export const InteractiveProjectPreview: React.FC<InteractivePreviewProps> = ({ p
 
   // 3. Real Estate State
   const [realEstateBedrooms, setRealEstateBedrooms] = useState('3 Beds');
-  const [priceMax, setPriceMax] = useState('$1,200,000');
+  const [priceMax, setPriceMax] = useState('৳1.2 Crore');
   const [savedProperty, setSavedProperty] = useState<string | null>(null);
 
   // 4. TaskFlow Dashboard State
@@ -228,7 +228,7 @@ export const InteractiveProjectPreview: React.FC<InteractivePreviewProps> = ({ p
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="p-3 bg-neutral-800/70 rounded-xl border border-neutral-700/60">
             <span className="text-xs text-neutral-400 block">MRR Growth</span>
-            <span className="text-base font-bold text-white font-mono">{period === '7d' ? '+$3,400' : period === '30d' ? '+$14,800' : '+$48,200'}</span>
+            <span className="text-base font-bold text-white font-mono">{period === '7d' ? '+৳34,000' : period === '30d' ? '+৳1,48,000' : '+৳4,82,000'}</span>
           </div>
           <div className="p-3 bg-neutral-800/70 rounded-xl border border-neutral-700/60">
             <span className="text-xs text-neutral-400 block">Active Users</span>
@@ -273,7 +273,7 @@ export const InteractiveProjectPreview: React.FC<InteractivePreviewProps> = ({ p
         <div className="flex items-start justify-between">
           <div>
             <h4 className="text-sm font-bold text-white">Minimalist Wool Overshirt</h4>
-            <p className="text-xs text-neutral-400">$185.00 · Free Global Shipping</p>
+            <p className="text-xs text-neutral-400">৳4,500 · Express Shipping</p>
           </div>
           <span className="text-xs font-mono px-2 py-0.5 bg-neutral-800 text-emerald-400 rounded">In Stock</span>
         </div>
@@ -342,7 +342,7 @@ export const InteractiveProjectPreview: React.FC<InteractivePreviewProps> = ({ p
       <div className="p-4 bg-neutral-800/80 rounded-xl flex items-center justify-between text-xs">
         <div>
           <span className="font-semibold block text-white">Client Handover Ready</span>
-          <span className="text-neutral-400">Clean GitHub repository & docs included</span>
+          <span className="text-neutral-400">Clean source code & documentation included</span>
         </div>
         <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 font-semibold rounded-md">Verified</span>
       </div>

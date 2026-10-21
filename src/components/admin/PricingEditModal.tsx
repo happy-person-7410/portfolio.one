@@ -89,7 +89,7 @@ export const PricingEditModal: React.FC<PricingEditModalProps> = ({
                 required
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="$499"
+                placeholder="৳15,000"
                 className="w-full px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

@@ -66,12 +66,26 @@ export interface PricingPlan {
   updatedAt?: string;
 }
 
+export interface AddonService {
+  id: string;
+  name: string;
+  price: string;
+  unit?: string;
+  description?: string;
+}
+
 export interface FaqItem {
   id?: string;
   question: string;
   answer: string;
   order?: number;
   updatedAt?: string;
+}
+
+export interface QuickFact {
+  label: string;
+  title: string;
+  desc: string;
 }
 
 export interface SiteProfile {
@@ -87,16 +101,19 @@ export interface SiteProfile {
   ogBanner: string;
   email: string;
   phone: string;
+  whatsappNumber: string;
+  whatsappUrl: string;
+  facebookPageUrl: string;
+  messengerUrl: string;
   whatsapp: string;
-  messengerUrl?: string;
   location: string;
   availability: string;
   socials: {
-    github: string;
-    linkedin: string;
     facebook: string;
     whatsapp: string;
-    messenger?: string;
+    messenger: string;
+    email?: string;
   };
   skills: string[];
+  quickFacts?: QuickFact[];
 }

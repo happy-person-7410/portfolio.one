@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Download, Printer, Code, Briefcase, GraduationCap, Sparkles } from 'lucide-react';
-import { PROFILE_INFO } from '../data/portfolioData';
+import { PROFILE_INFO, CONTACT_CONFIG } from '../data/portfolioData';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 
 interface ResumeModalProps {
@@ -18,7 +18,7 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
 
   const handleDownload = () => {
     const resumeText = `# Happy Person - Independent Creative Web & UI Studio
-${profile.location || PROFILE_INFO.location} | ${profile.email || PROFILE_INFO.email} | ${profile.phone || PROFILE_INFO.phone}
+${profile.location || PROFILE_INFO.location} | ${profile.email || PROFILE_INFO.email} | WhatsApp: ${profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl}
 
 ## Studio Profile
 Happy Person is an independent creative brand and frontend studio crafting modern, high-converting websites, appointment booking portals, and SaaS dashboards with Google AI Studio, React, TypeScript, and Tailwind CSS.
@@ -27,7 +27,7 @@ Happy Person is an independent creative brand and frontend studio crafting moder
 - Frontend & UI: React, TypeScript, JavaScript (ES6+), HTML5, Tailwind CSS, Motion, Component Systems, WCAG AA Accessibility
 - Prototyping & AI: Google AI Studio, Figma, Gemini API rapid prototyping
 - Backend & Integrations: Node.js, Express, Neon PostgreSQL, Neon Object Storage, REST APIs, Calendar APIs, Stripe Checkout
-- DevOps & Deployment: Git, GitHub, Vite, Vercel, Netlify, Cloud Run
+- DevOps & Deployment: Git, CI/CD, Vite, Vercel, Netlify, Cloud Run
 
 ## Selected Production Deliverables
 - BrightSmile Dental Clinic: Real-time booking portal reducing no-shows by 38%
@@ -131,8 +131,14 @@ Independent Creative Studio (2022 - Present)
                 <span>{profile.location || PROFILE_INFO.location}</span>
                 <span>·</span>
                 <span>{profile.email || PROFILE_INFO.email}</span>
-                <span>·</span>
-                <span>{profile.phone || PROFILE_INFO.phone}</span>
+                <a
+                  href={profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-emerald-500 transition-colors cursor-pointer"
+                >
+                  WhatsApp Chat
+                </a>
               </div>
             </div>
           </div>

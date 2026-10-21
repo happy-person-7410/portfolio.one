@@ -1,12 +1,17 @@
 import React from 'react';
-import { ArrowRight, Sparkles, MessageSquare, Clock, ShieldCheck } from 'lucide-react';
-import { Button } from './ui/Button';
+import { ArrowRight, Sparkles, MessageSquare, Clock, ShieldCheck, ExternalLink } from 'lucide-react';
+import { usePortfolioData } from '../context/PortfolioDataContext';
+import { MessengerIcon } from './icons/MessengerIcon';
 
 interface MidPageCTAProps {
   onStartProject: () => void;
 }
 
 export const MidPageCTA: React.FC<MidPageCTAProps> = ({ onStartProject }) => {
+  const { profile } = usePortfolioData();
+  const messengerLink = profile.messengerUrl || profile.socials?.messenger || 'https://m.me/happyperson7410';
+  const whatsappLink = profile.whatsappUrl || profile.socials?.whatsapp || 'https://wa.me/8801576654285';
+
   return (
     <section className="py-12 sm:py-16 bg-neutral-100/70 dark:bg-[#0e1422] border-y border-neutral-200/80 dark:border-neutral-800/80 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,22 +36,36 @@ export const MidPageCTA: React.FC<MidPageCTAProps> = ({ onStartProject }) => {
             </p>
 
             <div className="flex flex-wrap items-center gap-4 mb-8">
-              <button
-                onClick={onStartProject}
+              {/* Primary: Message on Messenger */}
+              <a
+                href={messengerLink}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white text-blue-700 hover:bg-neutral-100 font-bold text-sm shadow-md transition-all cursor-pointer active:scale-95"
               >
-                <span>Start a Project with Happy Person</span>
+                <MessengerIcon className="w-4 h-4 fill-blue-600" />
+                <span>Message on Messenger</span>
+              </a>
+
+              {/* Secondary: Start a Project */}
+              <button
+                onClick={onStartProject}
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-semibold transition-all cursor-pointer"
+              >
+                <span>Fill Project Request</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
+              {/* Secondary: WhatsApp */}
               <a
-                href="https://wa.me/15553492810"
+                href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-semibold transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-semibold transition-all cursor-pointer"
+                title="Chat on WhatsApp"
               >
                 <MessageSquare className="w-4 h-4 text-emerald-300" />
-                <span>Chat on WhatsApp</span>
+                <span>WhatsApp</span>
               </a>
             </div>
 

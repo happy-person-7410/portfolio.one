@@ -1,7 +1,8 @@
 import React from 'react';
-import { Github, Linkedin, Facebook, MessageSquare, ArrowUp, Heart, Smile } from 'lucide-react';
+import { Facebook, MessageSquare, Mail, ArrowUp, Smile } from 'lucide-react';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import { MessengerIcon } from './icons/MessengerIcon';
+import { CONTACT_CONFIG } from '../data/contactConfig';
 
 export const Footer: React.FC = () => {
   const { profile, services } = usePortfolioData();
@@ -56,57 +57,55 @@ export const Footer: React.FC = () => {
             </div>
             
             <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-sm">
-              An independent creative studio designing and developing modern websites, appointment booking portals, and web app interfaces with Google AI Studio.
+              An independent creative studio designing and developing modern websites, appointment booking portals, and web app interfaces.
             </p>
 
-            {/* Social Icons with Messenger as Primary */}
+            {/* 4 Allowed Contact Channels: Messenger, WhatsApp, Facebook, Email */}
             <div className="flex items-center gap-3 pt-2">
+              {/* 1. Messenger (Primary) */}
               <a
-                href={profile.messengerUrl || profile.socials?.messenger || 'https://m.me/happyperson.dev'}
+                href={profile.messengerUrl || CONTACT_CONFIG.messengerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-600 hover:text-white text-blue-600 dark:text-blue-400 flex items-center justify-center transition-all shadow-2xs focus-visible:ring-2 focus-visible:ring-blue-500"
                 aria-label="Facebook Messenger chat"
-                title="Message on Messenger (Fastest Reply)"
+                title="Message on Messenger (Primary Contact Method)"
               >
                 <MessengerIcon className="w-4 h-4 fill-current" />
               </a>
+
+              {/* 2. WhatsApp (Secondary) */}
               <a
-                href={profile.socials?.facebook || 'https://facebook.com'}
+                href={profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-[#171f33] hover:bg-blue-50 dark:hover:bg-blue-950/60 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center text-neutral-700 dark:text-neutral-300 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
-                aria-label="Facebook profile"
-              >
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a
-                href={profile.socials?.whatsapp || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-[#171f33] hover:bg-emerald-50 dark:hover:bg-emerald-950/60 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center justify-center text-neutral-700 dark:text-neutral-300 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
-                aria-label="WhatsApp chat (Secondary)"
-                title="WhatsApp (Secondary)"
+                className="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-[#171f33] hover:bg-emerald-50 dark:hover:bg-emerald-950/60 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center justify-center text-neutral-700 dark:text-neutral-300 transition-colors focus-visible:ring-2 focus-visible:ring-emerald-500"
+                aria-label="WhatsApp chat (Secondary Contact Method)"
+                title="Chat on WhatsApp"
               >
                 <MessageSquare className="w-4 h-4" />
               </a>
+
+              {/* 3. Facebook Page (Secondary) */}
               <a
-                href={profile.socials?.github || '#'}
+                href={profile.facebookPageUrl || CONTACT_CONFIG.facebookPageUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-[#171f33] hover:bg-blue-50 dark:hover:bg-blue-950/60 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center text-neutral-700 dark:text-neutral-300 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
-                aria-label="GitHub profile"
+                aria-label="Facebook Page (Secondary Contact Method)"
+                title="Facebook Page"
               >
-                <Github className="w-4 h-4" />
+                <Facebook className="w-4 h-4" />
               </a>
+
+              {/* 4. Email (Backup) */}
               <a
-                href={profile.socials?.linkedin || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-[#171f33] hover:bg-blue-50 dark:hover:bg-blue-950/60 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center text-neutral-700 dark:text-neutral-300 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
-                aria-label="LinkedIn profile"
+                href={`mailto:${profile.email || CONTACT_CONFIG.email}`}
+                className="w-9 h-9 rounded-lg bg-neutral-100 dark:bg-[#171f33] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 flex items-center justify-center"
+                aria-label="Email inquiry (Backup Contact Method)"
+                title="Email Inquiry"
               >
-                <Linkedin className="w-4 h-4" />
+                <Mail className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -157,10 +156,8 @@ export const Footer: React.FC = () => {
             © {new Date().getFullYear()} {profile.brandName || 'Happy Person'}. All rights reserved.
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <span>Crafted with care by</span>
-            <span className="font-semibold text-neutral-700 dark:text-neutral-300">Happy Person</span>
-            <span>using Google AI Studio.</span>
+          <div className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-500">
+            <span>Crafted with Happy</span>
           </div>
 
           <button
