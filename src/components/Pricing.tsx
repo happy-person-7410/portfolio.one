@@ -139,49 +139,28 @@ export const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
           ))}
         </div>
 
-        {/* Add-On Services Section */}
-        <div className="pt-8 border-t border-neutral-200/80 dark:border-[#1e293b]">
-          <div className="max-w-2xl mb-8">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-[#131b2e] border border-blue-200/80 dark:border-[#1e293b] text-xs font-semibold text-blue-700 dark:text-blue-300 mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-              <span>Modular Enhancements</span>
+        {/* Link to Dedicated Section 8: Add-Ons */}
+        <div className="pt-8 border-t border-neutral-200/80 dark:border-[#1e293b] flex flex-col sm:flex-row items-center justify-between gap-4 mb-12">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-[#171f33] text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200/60 dark:border-[#1e293b]">
+              <Sparkles className="w-5 h-5" />
             </div>
-            <h3 className="text-2xl font-bold text-neutral-950 dark:text-white">
-              Add-On Services
-            </h3>
-            <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-              Select optional branding, creative visuals, extra pages, or ongoing care to accompany your web build.
-            </p>
+            <div>
+              <h4 className="text-sm font-bold text-neutral-950 dark:text-white">
+                Looking for Logos, Social Banners, AI Visuals, or Maintenance?
+              </h4>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                Explore 7 modular add-on services starting from ৳300 in our dedicated Add-Ons section below.
+              </p>
+            </div>
           </div>
-
-          {/* Add-On Services Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-12">
-            {ADDON_SERVICES.map((addon) => (
-              <div 
-                key={addon.id} 
-                className="p-5 rounded-2xl bg-white dark:bg-[#111726] border border-neutral-200/90 dark:border-[#1e293b] shadow-2xs hover:border-blue-500/40 dark:hover:border-blue-500/40 transition-all flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex items-baseline justify-between mb-2">
-                    <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
-                      {addon.unit || 'Starting from'}
-                    </span>
-                    <span className="text-base font-extrabold text-neutral-950 dark:text-white font-mono tabular-nums">
-                      {addon.price}
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-bold text-neutral-950 dark:text-white mb-1.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {addon.name}
-                  </h4>
-                  {addon.description && (
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                      {addon.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          <a
+            href="#addons"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60 transition-colors cursor-pointer shrink-0"
+          >
+            <span>View All Add-Ons</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
         </div>
 
         {/* Custom Scope & Messenger Quick Inquiry Card */}

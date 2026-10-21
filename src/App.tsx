@@ -9,6 +9,9 @@ import { Hero } from './components/Hero';
 import { About } from './components/About';
 import { Services } from './components/Services';
 import { Projects } from './components/Projects';
+import { CreativeWork } from './components/CreativeWork';
+import { BeforeAfter } from './components/BeforeAfter';
+import { AddOns } from './components/AddOns';
 import { MidPageCTA } from './components/MidPageCTA';
 import { Process } from './components/Process';
 import { Testimonials } from './components/Testimonials';
@@ -68,7 +71,7 @@ export default function App() {
   useEffect(() => {
     const handleScroll = () => {
       if (isAdminRoute) return;
-      const sections = ['home', 'about', 'services', 'projects', 'process', 'testimonials', 'pricing', 'contact'];
+      const sections = ['home', 'about', 'projects', 'creative', 'before-after', 'services', 'pricing', 'addons', 'process', 'testimonials', 'faq', 'contact'];
       const scrollY = window.pageYOffset;
 
       for (const sectionId of sections) {
@@ -193,35 +196,35 @@ export default function App() {
       />
 
       <main id="main-content">
-        {/* 2. Hero Section (Single H1 on homepage) */}
+        {/* 1. Home Section */}
         <Hero
           onViewWorkClick={scrollToProjects}
           onHireMeClick={() => scrollToContact()}
         />
 
-        {/* 3. About Me Section */}
+        {/* 2. About Happy Person */}
         <About />
 
-        {/* 4. Services Section (8 Service Cards) */}
+        {/* 3. Web Projects (Live demos + modal details) */}
+        <Projects />
+
+        {/* 4. Creative & AI Work (Logos, Banners, AI Images, AI Videos) */}
+        <CreativeWork />
+
+        {/* 5. Before / After Redesigns */}
+        <BeforeAfter />
+
+        {/* 6. Services */}
         <Services
           onRequestService={(serviceName) => scrollToContact(serviceName)}
         />
 
-        {/* 5. Featured Projects Gallery & Detail Modal (8 Projects) */}
-        <Projects />
-
-        {/* 6. Mid-Page High-Conversion CTA Strip */}
+        {/* Mid-Page Conversion Strip */}
         <MidPageCTA
           onStartProject={() => scrollToContact()}
         />
 
-        {/* 7. My Process Section */}
-        <Process />
-
-        {/* 8. Testimonials Section */}
-        <Testimonials />
-
-        {/* 9. Pricing Section */}
+        {/* 7. Pricing */}
         <Pricing
           onSelectPlan={(planName, serviceCategory) => {
             const budgetMap: Record<string, string> = {
@@ -233,10 +236,23 @@ export default function App() {
           }}
         />
 
-        {/* 10. FAQ Accordion Section */}
+        {/* 8. Add-Ons */}
+        <AddOns
+          onSelectAddons={(addonNames) => {
+            scrollToContact('Website Design & Development', '৳5,000 - ৳15,000');
+          }}
+        />
+
+        {/* 9. Process */}
+        <Process />
+
+        {/* 10. Testimonials */}
+        <Testimonials />
+
+        {/* 11. FAQ */}
         <FAQ />
 
-        {/* 11. Contact Form & Direct Channels */}
+        {/* 12. Contact */}
         <Contact
           initialService={selectedService}
           initialBudget={selectedBudget}

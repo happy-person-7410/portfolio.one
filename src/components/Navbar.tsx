@@ -28,11 +28,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navLinks = [
     { name: 'Home', href: '#home', id: 'home' },
     { name: 'About', href: '#about', id: 'about' },
+    { name: 'Web Projects', href: '#projects', id: 'projects' },
+    { name: 'Creative & AI', href: '#creative', id: 'creative' },
+    { name: 'Before/After', href: '#before-after', id: 'before-after' },
     { name: 'Services', href: '#services', id: 'services' },
-    { name: 'Projects', href: '#projects', id: 'projects' },
-    { name: 'Process', href: '#process', id: 'process' },
-    { name: 'Testimonials', href: '#testimonials', id: 'testimonials' },
     { name: 'Pricing', href: '#pricing', id: 'pricing' },
+    { name: 'Add-Ons', href: '#addons', id: 'addons' },
+    { name: 'Process', href: '#process', id: 'process' },
+    { name: 'Reviews', href: '#testimonials', id: 'testimonials' },
+    { name: 'FAQ', href: '#faq', id: 'faq' },
     { name: 'Contact', href: '#contact', id: 'contact' },
   ];
 
@@ -101,7 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </a>
 
           {/* Zone 2: Navigation Links with Animated Underline Effect (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300" aria-label="Main Navigation">
+          <nav className="hidden lg:flex items-center gap-3 xl:gap-4 text-xs xl:text-[13px] font-medium text-slate-600 dark:text-slate-300 overflow-x-auto scrollbar-none py-1" aria-label="Main Navigation">
             {navLinks.map((link) => {
               const isActive = activeSection === link.id;
               return (

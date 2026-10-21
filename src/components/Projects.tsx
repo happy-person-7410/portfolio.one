@@ -8,18 +8,18 @@ import { usePortfolioData } from '../context/PortfolioDataContext';
 
 export const Projects: React.FC = () => {
   const { projects } = usePortfolioData();
-  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const categories: ProjectCategory[] = [
+  const categories: string[] = [
     'All',
-    'Business Website',
-    'Booking Website',
+    'Business',
+    'Booking',
     'Restaurant',
     'Real Estate',
     'E-commerce',
-    'Dashboard UI'
+    'Dashboard'
   ];
 
   const visibleProjects = useMemo(() => {
@@ -28,7 +28,12 @@ export const Projects: React.FC = () => {
 
   const filteredProjects = useMemo(() => {
     if (selectedCategory === 'All') return visibleProjects;
-    return visibleProjects.filter((p) => p.category === selectedCategory);
+    return visibleProjects.filter((p) => {
+      if (selectedCategory === 'Business') return p.category.includes('Business');
+      if (selectedCategory === 'Booking') return p.category.includes('Booking');
+      if (selectedCategory === 'Dashboard') return p.category.includes('Dashboard');
+      return p.category === selectedCategory;
+    });
   }, [selectedCategory, visibleProjects]);
 
   // Clean URL synchronization (/work/project-id)
@@ -233,7 +238,7 @@ export const Projects: React.FC = () => {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all cursor-pointer shadow-xs active:scale-95 hover:-translate-y-0.5"
                     >
-                      <span>Live Demo</span>
+                      <span>View Live Demo</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>
