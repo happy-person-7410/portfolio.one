@@ -7,12 +7,18 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "db:migrate": "npx tsx scripts/migrate.mjs",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1155.0",
+    "@neondatabase/serverless": "^1.2.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/bcryptjs": "^3.0.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.13",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
     "react": "^19.0.1",

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Save, AlertCircle } from 'lucide-react';
 import { Testimonial } from '../../types';
 import { saveTestimonial } from '../../services/portfolioService';
+import { ImageUploader } from './ImageUploader';
 
 interface TestimonialEditModalProps {
   testimonial?: Testimonial | null;
@@ -24,7 +25,7 @@ export const TestimonialEditModal: React.FC<TestimonialEditModalProps> = ({
   const [businessType, setBusinessType] = useState(testimonial?.businessType || 'Local Business');
   const [rating, setRating] = useState(testimonial?.rating || 5);
   const [quote, setQuote] = useState(testimonial?.quote || '');
-  const [avatar, setAvatar] = useState(testimonial?.avatar || '/src/assets/images/happy_person_mascot_1792166218374.jpg');
+  const [avatar, setAvatar] = useState(testimonial?.avatar || '/images/brand/happy-person-mascot.webp');
   const [location, setLocation] = useState(testimonial?.location || 'Remote Client');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,13 +135,27 @@ export const TestimonialEditModal: React.FC<TestimonialEditModalProps> = ({
             <label className="block text-xs font-medium text-slate-300 mb-1">Client Quote</label>
             <textarea
               required
-              rows={4}
+              rows={3}
               value={quote}
               onChange={(e) => setQuote(e.target.value)}
               placeholder="Happy Person completely transformed our online presence..."
               className="w-full px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+
+          <ImageUploader
+            value={avatar}
+            onChange={setAvatar}
+            folder="testimonials"
+            label="Client Avatar Photo"
+            description="Stored in repository /public/images/testimonials/ folder. Square crop."
+            aspectRatio="square"
+            recommendedDimensions="400 × 400px"
+            presetChoices={[
+              { label: 'Happy Mascot', url: '/images/brand/happy-person-mascot.webp' },
+              { label: 'Studio Badge', url: '/images/creative/logo-brand-01.webp' }
+            ]}
+          />
 
           <div className="pt-3 border-t border-slate-800 flex justify-end gap-2.5">
             <button

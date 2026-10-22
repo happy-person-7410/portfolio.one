@@ -11,8 +11,8 @@ export const PROFILE_INFO: SiteProfile = {
   title: "Independent Creative Web Designer & UI Developer",
   headline: "I design and build modern websites that help businesses get more customers.",
   subheading: "Custom web design, responsive websites, booking systems, dashboards, and AI-powered web app UIs by Happy Person.",
-  avatar: "/src/assets/images/happy_person_mascot_1792166218374.jpg",
-  ogBanner: "/src/assets/images/happy_person_banner_1792166219172.jpg",
+  avatar: "/images/brand/happy-person-mascot.webp",
+  ogBanner: "/images/banners/og-preview.webp",
   bio: "Hello! I'm Happy Person—an independent creative web designer and frontend developer represented by a friendly, reliable studio mascot. I specialize in turning business ideas into clean, fast, and high-converting digital experiences. Using modern React, TypeScript, and styling, I build everything from local service landing pages and appointment booking systems to high-utility SaaS dashboards. I bring a friendly, playful creative touch backed by rigorous engineering and clear, reliable communication.",
   email: CONTACT_CONFIG.email,
   phone: CONTACT_CONFIG.whatsAppNumber,
@@ -74,7 +74,7 @@ export const PROJECTS: Project[] = [
     category: "Booking Website",
     description: "Modern dental clinic website with automated appointment booking, treatment showcase, and patient portal.",
     tags: ["React", "TypeScript", "Tailwind CSS", "Calendar API", "Neon PostgreSQL"],
-    thumbnail: "/src/assets/images/dental_clinic_mockup_1792086718777.jpg",
+    thumbnail: "/images/projects/dental-clinic-hero.webp",
     previewVideoUrl: "",
     liveDemoUrl: "https://example.com/demo/brightsmile",
     client: "BrightSmile Dental Practice",
@@ -94,8 +94,8 @@ export const PROJECTS: Project[] = [
       { label: "Mobile Bounce Rate", value: "-24%" }
     ],
     screenshots: [
-      "/src/assets/images/dental_clinic_mockup_1792086718777.jpg",
-      "/src/assets/images/happy_person_banner_1792166219172.jpg"
+      "/images/projects/dental-clinic-hero.webp",
+      "/images/banners/happy-person-banner.webp"
     ]
   },
   {
@@ -104,7 +104,7 @@ export const PROJECTS: Project[] = [
     category: "Restaurant",
     description: "Atmospheric culinary showcase featuring an interactive seasonal menu, photography gallery, and instant table reservation.",
     tags: ["React", "Tailwind CSS", "OpenTable API", "Motion", "SEO"],
-    thumbnail: "/src/assets/images/restaurant_mockup_1792086719466.jpg",
+    thumbnail: "/images/projects/restaurant-hero.webp",
     previewVideoUrl: "",
     liveDemoUrl: "https://example.com/demo/urbaneats",
     client: "UrbanEats Bistro & Lounge",
@@ -124,7 +124,7 @@ export const PROJECTS: Project[] = [
       { label: "Avg Session Duration", value: "2m 45s" }
     ],
     screenshots: [
-      "/src/assets/images/restaurant_mockup_1792086719466.jpg"
+      "/images/projects/restaurant-hero.webp"
     ]
   },
   {
@@ -133,7 +133,7 @@ export const PROJECTS: Project[] = [
     category: "Real Estate",
     description: "High-end property listing platform with multi-parameter neighborhood filters, interactive virtual tours, and direct agent inquiry.",
     tags: ["React", "TypeScript", "Tailwind CSS", "Mapbox", "Supabase"],
-    thumbnail: "/src/assets/images/realestate_mockup_1792086719579.jpg",
+    thumbnail: "/images/projects/real-estate-hero.webp",
     previewVideoUrl: "",
     liveDemoUrl: "https://example.com/demo/homenest",
     client: "HomeNest Realty Group",
@@ -153,7 +153,7 @@ export const PROJECTS: Project[] = [
       { label: "Load Speed", value: "0.8s" }
     ],
     screenshots: [
-      "/src/assets/images/realestate_mockup_1792086719579.jpg"
+      "/images/projects/real-estate-hero.webp"
     ]
   },
   {
@@ -162,7 +162,7 @@ export const PROJECTS: Project[] = [
     category: "Dashboard UI",
     description: "Sleek SaaS productivity and analytics interface with real-time metrics, Kanban task pipelines, and member permission controls.",
     tags: ["React", "TypeScript", "Tailwind CSS", "Recharts", "Lucide"],
-    thumbnail: "/src/assets/images/saas_dashboard_mockup_1792086720504.jpg",
+    thumbnail: "/images/projects/saas-dashboard-hero.webp",
     previewVideoUrl: "",
     liveDemoUrl: "https://example.com/demo/taskflow",
     client: "TaskFlow Technologies",
@@ -182,7 +182,7 @@ export const PROJECTS: Project[] = [
       { label: "Onboarding Time", value: "-60%" }
     ],
     screenshots: [
-      "/src/assets/images/saas_dashboard_mockup_1792086720504.jpg"
+      "/images/projects/saas-dashboard-hero.webp"
     ]
   },
   {
@@ -191,7 +191,7 @@ export const PROJECTS: Project[] = [
     category: "Business Website",
     description: "High-energy fitness club landing page with transparent membership tiers, group class schedules, and free 7-day trial signup.",
     tags: ["React", "Tailwind CSS", "Motion", "Stripe Checkout", "Forms"],
-    thumbnail: "/src/assets/images/dental_clinic_mockup_1792086718777.jpg",
+    thumbnail: "/images/projects/dental-clinic-hero.webp",
     previewVideoUrl: "",
     liveDemoUrl: "https://example.com/demo/fitlife",
     client: "FitLife Athletic Club",
@@ -211,7 +211,7 @@ export const PROJECTS: Project[] = [
       { label: "Mobile Conversion", value: "8.4%" }
     ],
     screenshots: [
-      "/src/assets/images/dental_clinic_mockup_1792086718777.jpg"
+      "/images/projects/dental-clinic-hero.webp"
     ]
   },
   {
@@ -220,7 +220,7 @@ export const PROJECTS: Project[] = [
     category: "E-commerce",
     description: "Contemporary fashion e-commerce storefront with curated collections, dynamic size selection, sliding cart drawer, and frictionless checkout.",
     tags: ["React", "TypeScript", "Tailwind CSS", "Shopify API", "Motion"],
-    thumbnail: "/src/assets/images/restaurant_mockup_1792086719466.jpg",
+    thumbnail: "/images/projects/restaurant-hero.webp",
     previewVideoUrl: "",
     liveDemoUrl: "https://example.com/demo/stylehub",
     client: "StyleHub Apparel",
@@ -240,7 +240,7 @@ export const PROJECTS: Project[] = [
       { label: "Mobile Speed Index", value: "1.1s" }
     ],
     screenshots: [
-      "/src/assets/images/restaurant_mockup_1792086719466.jpg"
+      "/images/projects/restaurant-hero.webp"
     ]
   },
   {
@@ -249,7 +249,7 @@ export const PROJECTS: Project[] = [
     category: "Business Website",
     description: "Local commercial and residential cleaning service website with an instant quote calculator, zip-code service check, and booking form.",
     tags: ["React", "Tailwind CSS", "Formik", "Google Maps API", "Vite"],
-    thumbnail: "/src/assets/images/dental_clinic_mockup_1792086718777.jpg",
+    thumbnail: "/images/projects/dental-clinic-hero.webp",
     previewVideoUrl: "",
     liveDemoUrl: "https://example.com/demo/cleanpro",
     client: "CleanPro Residential & Commercial",
@@ -269,7 +269,7 @@ export const PROJECTS: Project[] = [
       { label: "Phone Tag Reduced", value: "75%" }
     ],
     screenshots: [
-      "/src/assets/images/dental_clinic_mockup_1792086718777.jpg"
+      "/images/projects/dental-clinic-hero.webp"
     ]
   },
   {
@@ -278,7 +278,7 @@ export const PROJECTS: Project[] = [
     category: "Business Website",
     description: "Coaching institute & learning hub web portal featuring comprehensive course curriculums, faculty bios, student enrollment, and fee calculator.",
     tags: ["React", "TypeScript", "Tailwind CSS", "PDF Export", "Responsive"],
-    thumbnail: "/src/assets/images/saas_dashboard_mockup_1792086720504.jpg",
+    thumbnail: "/images/projects/saas-dashboard-hero.webp",
     previewVideoUrl: "",
     liveDemoUrl: "https://example.com/demo/edupath",
     client: "EduPath Learning Institute",
@@ -298,7 +298,7 @@ export const PROJECTS: Project[] = [
       { label: "Parent Inquiries", value: "+74%" }
     ],
     screenshots: [
-      "/src/assets/images/saas_dashboard_mockup_1792086720504.jpg"
+      "/images/projects/saas-dashboard-hero.webp"
     ]
   }
 ];

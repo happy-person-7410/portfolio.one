@@ -1,0 +1,142 @@
+[
+  {
+    "fileName": "dental-clinic-hero.webp",
+    "fallbackFileName": "dental-clinic-hero.jpg",
+    "publicPath": "/images/projects/dental-clinic-hero.webp",
+    "fallbackPath": "/images/projects/dental-clinic-hero.jpg",
+    "category": "Portfolio Projects",
+    "belongsTo": "BrightSmile Dental Clinic (also CleanPro & FitLife presets)",
+    "usedInDatabase": true,
+    "dbTables": ["projects.thumbnail_url", "project_images.image_url"]
+  },
+  {
+    "fileName": "restaurant-hero.webp",
+    "fallbackFileName": "restaurant-hero.jpg",
+    "publicPath": "/images/projects/restaurant-hero.webp",
+    "fallbackPath": "/images/projects/restaurant-hero.jpg",
+    "category": "Portfolio Projects",
+    "belongsTo": "UrbanEats Restaurant (also StyleHub Store preset)",
+    "usedInDatabase": true,
+    "dbTables": ["projects.thumbnail_url", "project_images.image_url"]
+  },
+  {
+    "fileName": "real-estate-hero.webp",
+    "fallbackFileName": "real-estate-hero.jpg",
+    "publicPath": "/images/projects/real-estate-hero.webp",
+    "fallbackPath": "/images/projects/real-estate-hero.jpg",
+    "category": "Portfolio Projects",
+    "belongsTo": "HomeNest Luxury Real Estate",
+    "usedInDatabase": true,
+    "dbTables": ["projects.thumbnail_url", "project_images.image_url"]
+  },
+  {
+    "fileName": "saas-dashboard-hero.webp",
+    "fallbackFileName": "saas-dashboard-hero.jpg",
+    "publicPath": "/images/projects/saas-dashboard-hero.webp",
+    "fallbackPath": "/images/projects/saas-dashboard-hero.jpg",
+    "category": "Portfolio Projects",
+    "belongsTo": "TaskFlow Dashboard (also EduPath Academy preset)",
+    "usedInDatabase": true,
+    "dbTables": ["projects.thumbnail_url", "project_images.image_url"]
+  },
+  {
+    "fileName": "logo-brand-01.webp",
+    "fallbackFileName": "logo-brand-01.jpg",
+    "publicPath": "/images/creative/logo-brand-01.webp",
+    "fallbackPath": "/images/creative/logo-brand-01.jpg",
+    "category": "Creative Works - Logos",
+    "belongsTo": "Happy Person Studio Mascot badge",
+    "usedInDatabase": true,
+    "dbTables": ["creative_works.thumbnail_url"]
+  },
+  {
+    "fileName": "saas-ui-concept.webp",
+    "fallbackFileName": "saas-ui-concept.jpg",
+    "publicPath": "/images/creative/saas-ui-concept.webp",
+    "fallbackPath": "/images/creative/saas-ui-concept.jpg",
+    "category": "Creative Works - Banners",
+    "belongsTo": "TaskFlow SaaS Product Launch Header",
+    "usedInDatabase": true,
+    "dbTables": ["creative_works.thumbnail_url"]
+  },
+  {
+    "fileName": "social-banner-01.webp",
+    "fallbackFileName": "social-banner-01.jpg",
+    "publicPath": "/images/creative/social-banner-01.webp",
+    "fallbackPath": "/images/creative/social-banner-01.jpg",
+    "category": "Creative Works - Banners",
+    "belongsTo": "Social Media Cover & Header Set",
+    "usedInDatabase": true,
+    "dbTables": ["creative_works.thumbnail_url"]
+  },
+  {
+    "fileName": "ai-video-thumb-01.webp",
+    "fallbackFileName": "ai-video-thumb-01.jpg",
+    "publicPath": "/images/creative/ai-video-thumb-01.webp",
+    "fallbackPath": "/images/creative/ai-video-thumb-01.jpg",
+    "category": "Creative Works - AI Videos",
+    "belongsTo": "Happy Person Mascot Studio Motion Teaser",
+    "usedInDatabase": true,
+    "dbTables": ["creative_works.thumbnail_url"]
+  },
+  {
+    "fileName": "ai-video-thumb-02.webp",
+    "fallbackFileName": "ai-video-thumb-02.jpg",
+    "publicPath": "/images/creative/ai-video-thumb-02.webp",
+    "fallbackPath": "/images/creative/ai-video-thumb-02.jpg",
+    "category": "Creative Works - AI Videos",
+    "belongsTo": "Interactive Web & SaaS UI Walkthrough",
+    "usedInDatabase": true,
+    "dbTables": ["creative_works.thumbnail_url"]
+  },
+  {
+    "fileName": "og-preview.webp",
+    "fallbackFileName": "og-preview.jpg",
+    "publicPath": "/images/banners/og-preview.webp",
+    "fallbackPath": "/images/banners/og-preview.jpg",
+    "category": "Banners & Social Share Cards",
+    "belongsTo": "Happy Person 1200x630 OpenGraph & Twitter Card",
+    "usedInDatabase": true,
+    "dbTables": ["site_settings.og_image_url"]
+  },
+  {
+    "fileName": "happy-person-banner.webp",
+    "fallbackFileName": "happy-person-banner.jpg",
+    "publicPath": "/images/banners/happy-person-banner.webp",
+    "fallbackPath": "/images/banners/happy-person-banner.jpg",
+    "category": "Banners & Social Share Cards",
+    "belongsTo": "Happy Person Studio Panoramic Showcase",
+    "usedInDatabase": true,
+    "dbTables": ["creative_works.thumbnail_url", "project_images.image_url"]
+  },
+  {
+    "fileName": "happy-person-mascot.webp",
+    "fallbackFileName": "happy-person-mascot.jpg",
+    "publicPath": "/images/brand/happy-person-mascot.webp",
+    "fallbackPath": "/images/brand/happy-person-mascot.jpg",
+    "category": "Brand Assets & Logos",
+    "belongsTo": "Happy Person Brand Mascot Badge & Default Avatar",
+    "usedInDatabase": true,
+    "dbTables": ["testimonials.avatar_url", "site_profile.avatar"]
+  },
+  {
+    "fileName": "happy-person-avatar.webp",
+    "fallbackFileName": "happy-person-avatar.jpg",
+    "publicPath": "/images/brand/happy-person-avatar.webp",
+    "fallbackPath": "/images/brand/happy-person-avatar.jpg",
+    "category": "Brand Assets & Logos",
+    "belongsTo": "Happy Person Rounded Profile Mascot Avatar",
+    "usedInDatabase": false,
+    "dbTables": []
+  },
+  {
+    "fileName": "hero-profile-portrait.webp",
+    "fallbackFileName": "hero-profile-portrait.jpg",
+    "publicPath": "/images/brand/hero-profile-portrait.webp",
+    "fallbackPath": "/images/brand/hero-profile-portrait.jpg",
+    "category": "Brand Assets & Logos",
+    "belongsTo": "Happy Person Hero Profile Portrait",
+    "usedInDatabase": false,
+    "dbTables": []
+  }
+]

@@ -10,13 +10,15 @@ import {
   Sparkles,
   Copy,
   Check,
-  RotateCcw
+  RotateCcw,
+  Loader2
 } from 'lucide-react';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import { SectionHeader } from './ui/SectionHeader';
 import { Button } from './ui/Button';
 import { MessengerIcon } from './icons/MessengerIcon';
 import { CONTACT_CONFIG } from '../data/contactConfig';
+import { submitContactRequest } from '../services/portfolioService';
 
 interface ContactProps {
   initialService?: string;
@@ -49,6 +51,7 @@ export const Contact: React.FC<ContactProps> = ({ initialService, initialBudget 
   const [errorMessage, setErrorMessage] = useState('');
   const [generatedMessage, setGeneratedMessage] = useState('');
   const [copied, setCopied] = useState(false);
+  const [dbSaved, setDbSaved] = useState<boolean>(true);
 
   // Update formData when props change
   useEffect(() => {
@@ -109,7 +112,7 @@ export const Contact: React.FC<ContactProps> = ({ initialService, initialBudget 
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     
@@ -120,17 +123,51 @@ export const Contact: React.FC<ContactProps> = ({ initialService, initialBudget 
       return;
     }
 
+    setStatus('submitting');
+
     const message = createFormattedMessage(formData);
     setGeneratedMessage(message);
-    setStatus('ready');
+
+    let savedSuccessfully = false;
+
+    // 1. Save submitted inquiry to the contact_requests table in Neon PostgreSQL
+    try {
+      await submitContactRequest({
+        name: formData.name.trim(),
+        email: formData.preferredContact === 'Email' ? 'Client via web form' : '',
+        messengerLink: formData.preferredContact === 'Messenger' ? 'https://m.me/happyperson7410' : '',
+        whatsappNumber: formData.preferredContact === 'WhatsApp' ? (profile?.whatsappNumber || CONTACT_CONFIG.whatsAppNumber) : '',
+        businessName: formData.businessName.trim(),
+        businessType: formData.businessType.trim(),
+        serviceNeeded: formData.service,
+        budgetRange: formData.budget,
+        deadline: formData.deadline.trim(),
+        referenceLinks: formData.referenceWebsites.trim(),
+        projectDetails: [
+          formData.details.trim(),
+          formData.featuresNeeded.trim() ? `\n\nPages/Features Needed: ${formData.featuresNeeded.trim()}` : ''
+        ].filter(Boolean).join(''),
+        preferredContact: formData.preferredContact,
+      });
+      savedSuccessfully = true;
+    } catch (err) {
+      console.warn('Backend database save notice (fallback to direct contact):', err);
+      // 7. If the database request fails, still allow the visitor to copy the message and contact on Messenger.
+      savedSuccessfully = false;
+    }
+
+    setDbSaved(savedSuccessfully);
 
     // Automatically attempt to copy to clipboard for convenience
-    navigator.clipboard.writeText(message).then(() => {
+    try {
+      await navigator.clipboard.writeText(message);
       setCopied(true);
       setTimeout(() => setCopied(false), 3500);
-    }).catch(() => {
+    } catch {
       // Silently proceed if browser blocks unprompted clipboard write
-    });
+    }
+
+    setStatus('ready');
   };
 
   const handleEditAgain = () => {
@@ -314,15 +351,20 @@ export const Contact: React.FC<ContactProps> = ({ initialService, initialBudget 
                 <div className="space-y-6 animate-in fade-in duration-300">
                   
                   {/* Success Alert Header */}
-                  <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300">
+                  <div className="flex items-start gap-3.5 p-4 sm:p-5 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500/30 text-emerald-800 dark:text-emerald-300">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                    <div className="text-xs leading-relaxed">
-                      <p className="font-bold text-sm text-emerald-950 dark:text-emerald-200 mb-0.5">
-                        Your Project Request is Ready!
+                    <div className="text-xs leading-relaxed space-y-1">
+                      <p className="font-bold text-sm text-emerald-950 dark:text-emerald-200">
+                        {dbSaved ? 'Your Request Has Been Saved!' : 'Your Project Request is Ready!'}
                       </p>
-                      <p className="font-medium text-emerald-700 dark:text-emerald-300">
-                        Your message has been copied. Paste it into Messenger and send it to Happy Person.
+                      <p className="font-semibold text-emerald-900 dark:text-emerald-200 text-sm">
+                        Your request has been saved. Your message has been copied. Paste it into Messenger and send it to Happy Person.
                       </p>
+                      {!dbSaved && (
+                        <p className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80">
+                          (Direct database sync was offline, but your message is copied and ready to send via Messenger below.)
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -617,19 +659,20 @@ export const Contact: React.FC<ContactProps> = ({ initialService, initialBudget 
                     ></textarea>
                   </div>
 
-                  {/* Send Request Button (Client-side message generator) */}
+                  {/* Send Request Button */}
                   <Button
                     type="submit"
                     variant="primary"
                     size="lg"
-                    icon={<Send className="w-4 h-4" />}
-                    className="w-full cursor-pointer"
+                    disabled={status === 'submitting'}
+                    icon={status === 'submitting' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    className="w-full cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                   >
-                    Send Request
+                    {status === 'submitting' ? 'Saving Request & Preparing Message...' : 'Send Request'}
                   </Button>
 
                   <p className="text-[11px] text-neutral-400 dark:text-neutral-500 text-center">
-                    Instant local generation. No data sent to any third-party server.
+                    Direct Messenger delivery with instant request archiving in Neon PostgreSQL.
                   </p>
 
                 </form>

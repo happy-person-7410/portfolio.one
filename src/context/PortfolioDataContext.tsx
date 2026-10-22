@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Project, Service, PricingPlan, Testimonial, FaqItem, SiteProfile } from '../types';
+import { CreativeItem } from '../data/creativeData';
 import {
   PROJECTS as DEFAULT_PROJECTS,
   SERVICES as DEFAULT_SERVICES,
@@ -8,6 +9,7 @@ import {
   FAQ_ITEMS as DEFAULT_FAQS,
   PROFILE_INFO as DEFAULT_PROFILE,
 } from '../data/portfolioData';
+import { CREATIVE_ITEMS as DEFAULT_CREATIVE } from '../data/creativeData';
 import {
   subscribeToProjects,
   subscribeToServices,
@@ -15,10 +17,19 @@ import {
   subscribeToTestimonials,
   subscribeToFaqs,
   subscribeToSiteProfile,
+  subscribeToCreativeWorks,
+  fetchProjects,
+  fetchCreativeWorks,
+  fetchServices,
+  fetchPricing,
+  fetchTestimonials,
+  fetchFaqs,
+  fetchSiteProfile,
 } from '../services/portfolioService';
 
 interface PortfolioDataContextType {
   projects: Project[];
+  creativeWorks: CreativeItem[];
   services: Service[];
   pricingPlans: PricingPlan[];
   testimonials: Testimonial[];
@@ -26,12 +37,15 @@ interface PortfolioDataContextType {
   profile: SiteProfile;
   isLoading: boolean;
   isOnline: boolean;
+  error: string | null;
+  refreshData: () => Promise<void>;
 }
 
 const PortfolioDataContext = createContext<PortfolioDataContextType | undefined>(undefined);
 
 export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
+  const [creativeWorks, setCreativeWorks] = useState<CreativeItem[]>(DEFAULT_CREATIVE);
   const [services, setServices] = useState<Service[]>(DEFAULT_SERVICES);
   const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>(DEFAULT_PRICING);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
@@ -39,6 +53,36 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [profile, setProfile] = useState<SiteProfile>(DEFAULT_PROFILE);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refreshData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const [p, c, s, pr, t, f, prof] = await Promise.allSettled([
+        fetchProjects(),
+        fetchCreativeWorks(),
+        fetchServices(),
+        fetchPricing(),
+        fetchTestimonials(),
+        fetchFaqs(),
+        fetchSiteProfile(),
+      ]);
+
+      if (p.status === 'fulfilled' && p.value?.length) setProjects(p.value);
+      if (c.status === 'fulfilled' && c.value?.length) setCreativeWorks(c.value);
+      if (s.status === 'fulfilled' && s.value?.length) setServices(s.value);
+      if (pr.status === 'fulfilled' && pr.value?.length) setPricingPlans(pr.value);
+      if (t.status === 'fulfilled' && t.value?.length) setTestimonials(t.value);
+      if (f.status === 'fulfilled' && f.value?.length) setFaqs(f.value);
+      if (prof.status === 'fulfilled' && prof.value) setProfile((prev) => ({ ...prev, ...prof.value }));
+    } catch (err) {
+      console.warn('Refresh error:', err);
+      setError('Could not refresh latest portfolio data from server.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let unsubs: (() => void)[] = [];
@@ -47,63 +91,61 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         setIsOnline(true);
 
-        // 1. Projects subscription
+        // 1. Projects
         const unsubProjects = subscribeToProjects(
           (items) => {
-            if (items) {
-              setProjects(items);
-            }
+            if (items && items.length > 0) setProjects(items);
             setIsLoading(false);
           },
-          (err) => {
-            console.warn('Projects local load warning:', err);
-            setIsLoading(false);
-          }
+          () => setIsLoading(false)
         );
         unsubs.push(unsubProjects);
 
-        // 2. Services subscription
+        // 2. Creative works
+        const unsubCreative = subscribeToCreativeWorks(
+          (items) => {
+            if (items && items.length > 0) setCreativeWorks(items);
+          }
+        );
+        unsubs.push(unsubCreative);
+
+        // 3. Services
         const unsubServices = subscribeToServices(
           (items) => {
             if (items && items.length > 0) setServices(items);
-          },
-          (err) => console.warn('Services fetch warning:', err)
+          }
         );
         unsubs.push(unsubServices);
 
-        // 3. Pricing subscription
+        // 4. Pricing
         const unsubPricing = subscribeToPricing(
           (items) => {
             if (items && items.length > 0) setPricingPlans(items);
-          },
-          (err) => console.warn('Pricing fetch warning:', err)
+          }
         );
         unsubs.push(unsubPricing);
 
-        // 4. Testimonials subscription
+        // 5. Testimonials
         const unsubTestimonials = subscribeToTestimonials(
           (items) => {
             if (items && items.length > 0) setTestimonials(items);
-          },
-          (err) => console.warn('Testimonials fetch warning:', err)
+          }
         );
         unsubs.push(unsubTestimonials);
 
-        // 5. FAQs subscription
+        // 6. FAQs
         const unsubFaqs = subscribeToFaqs(
           (items) => {
             if (items && items.length > 0) setFaqs(items);
-          },
-          (err) => console.warn('FAQs fetch warning:', err)
+          }
         );
         unsubs.push(unsubFaqs);
 
-        // 6. Profile subscription
+        // 7. Profile
         const unsubProfile = subscribeToSiteProfile(
           (item) => {
             if (item) setProfile((prev) => ({ ...DEFAULT_PROFILE, ...prev, ...item }));
-          },
-          (err) => console.warn('Profile fetch warning:', err)
+          }
         );
         unsubs.push(unsubProfile);
 
@@ -124,6 +166,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
     <PortfolioDataContext.Provider
       value={{
         projects,
+        creativeWorks,
         services,
         pricingPlans,
         testimonials,
@@ -131,6 +174,8 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
         profile,
         isLoading,
         isOnline,
+        error,
+        refreshData,
       }}
     >
       {children}

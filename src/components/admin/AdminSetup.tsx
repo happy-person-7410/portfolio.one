@@ -46,8 +46,21 @@ export const AdminSetup: React.FC<AdminSetupProps> = ({ onBackToSite, onGoToLogi
 
     setLoading(true);
     try {
-      // Simulate credential setup locally
-      await new Promise((r) => setTimeout(r, 400));
+      const res = await fetch('/api/admin/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: newPassword,
+          setupKey: setupKey.trim(),
+        }),
+      });
+
+      const data = await res.json() as { success?: boolean; error?: string };
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to setup admin password.');
+      }
+
       localStorage.setItem('hp_admin_local_configured', 'true');
       setIsSuccess(true);
     } catch (err) {

@@ -9,8 +9,10 @@ export interface CreativeItem {
   fullImage?: string;
   youtubeId?: string;
   youtubeUrl?: string;
+  videoUrl?: string;
   toolsUsed: string[];
   deliverables?: string[];
+  order?: number;
 }
 
 export const CREATIVE_ITEMS: CreativeItem[] = [
@@ -32,8 +34,8 @@ export const CREATIVE_ITEMS: CreativeItem[] = [
     title: "Happy Person Studio Mascot",
     category: "Logos & Branding",
     shortDescription: "Custom brand mascot character and expressive badge system designed to give digital interfaces a friendly, approachable persona.",
-    thumbnail: "/src/assets/images/happy_person_mascot_1792166218374.jpg",
-    fullImage: "/src/assets/images/happy_person_mascot_1792166218374.jpg",
+    thumbnail: "/images/creative/logo-brand-01.webp",
+    fullImage: "/images/creative/logo-brand-01.webp",
     toolsUsed: ["AI Prototyping", "Vector Illustration", "Design System"],
     deliverables: ["Full mascot badge", "Favicon & avatar crop", "Dark/Light mode contrast variants", "Social media profile kit"]
   },
@@ -86,8 +88,8 @@ export const CREATIVE_ITEMS: CreativeItem[] = [
     title: "TaskFlow SaaS Product Launch Header",
     category: "Banners & Social Media",
     shortDescription: "Sleek tech header showcasing live dashboard cards, user growth graph pills, and conversion-optimized call-to-action buttons.",
-    thumbnail: "/src/assets/images/saas_dashboard_mockup_1792086720504.jpg",
-    fullImage: "/src/assets/images/saas_dashboard_mockup_1792086720504.jpg",
+    thumbnail: "/images/creative/saas-ui-concept.webp",
+    fullImage: "/images/creative/saas-ui-concept.webp",
     toolsUsed: ["UI Layout", "3D Elevation", "Gradient Glows"],
     deliverables: ["Twitter/X Header (1500x500)", "Professional Company Cover (1584x396)", "Product Hunt hero banner", "Retina preview mockups"]
   },
@@ -96,8 +98,8 @@ export const CREATIVE_ITEMS: CreativeItem[] = [
     title: "Happy Person Studio Panoramic Showcase",
     category: "Banners & Social Media",
     shortDescription: "Vibrant high-resolution brand banner displaying the studio mascot, signature neon blue accents, and core design specialties.",
-    thumbnail: "/src/assets/images/happy_person_banner_1792166219172.jpg",
-    fullImage: "/src/assets/images/happy_person_banner_1792166219172.jpg",
+    thumbnail: "/images/banners/happy-person-banner.webp",
+    fullImage: "/images/banners/happy-person-banner.webp",
     toolsUsed: ["AI Generation", "Color Balancing", "Brand Assets"],
     deliverables: ["Website hero wallpaper", "1920x1080 Full HD banner", "Facebook page cover", "OpenGraph 1200x630 preview"]
   },
@@ -165,7 +167,7 @@ export const CREATIVE_ITEMS: CreativeItem[] = [
     title: "Happy Person Mascot Studio Motion Teaser",
     category: "AI Videos",
     shortDescription: "Playful character animation highlighting Happy Person's creative workflow, friendly communication, and rapid frontend delivery.",
-    thumbnail: "/src/assets/images/happy_person_banner_1792166219172.jpg",
+    thumbnail: "/images/creative/ai-video-thumb-01.webp",
     youtubeId: "L_LUpnjgPso",
     youtubeUrl: "https://www.youtube.com/watch?v=L_LUpnjgPso",
     toolsUsed: ["AI Character Motion", "Keyframe Animation", "Color Grading"],
@@ -176,7 +178,7 @@ export const CREATIVE_ITEMS: CreativeItem[] = [
     title: "Interactive Web & SaaS UI Walkthrough",
     category: "AI Videos",
     shortDescription: "Dynamic 60fps video walkthrough showcasing fluid responsive interactions, smooth appointment booking flows, and instant sub-second page loads.",
-    thumbnail: "/src/assets/images/realestate_mockup_1792086719579.jpg",
+    thumbnail: "/images/creative/ai-video-thumb-02.webp",
     youtubeId: "ysz5S6PUM-U",
     youtubeUrl: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
     toolsUsed: ["Screen Capture 4K", "Smooth Pan & Zoom", "Voiceover Audio", "Motion Graphics"],

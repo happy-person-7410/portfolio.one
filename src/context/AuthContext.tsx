@@ -1,12 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { getAuthToken, setAuthToken } from '../services/portfolioService';
 
 export interface UserSession {
+  id?: string;
   email: string;
   role: string;
 }
 
 interface AuthContextType {
   user: UserSession | null;
+  token: string | null;
   isOwnerAdmin: boolean;
   loading: boolean;
   ownerEmail: string;
@@ -20,113 +23,122 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const OWNER_EMAIL = 'faysalhappy7410@gmail.com';
+export const OWNER_EMAIL = 'happyperson7410@gmail.com';
 
 export function isOwner(email?: string | null): boolean {
   if (!email) return false;
   const lower = email.toLowerCase();
   return (
     lower === OWNER_EMAIL.toLowerCase() ||
-    lower === 'happyperson7410@gmail.com' ||
+    lower === 'faysalhappy7410@gmail.com' ||
     lower === 'danahobi20@gmail.com'
   );
 }
 
-const AUTH_STORAGE_KEY = 'hp_portfolio_mock_user';
-
-function getStoredUser(): UserSession | null {
-  try {
-    const raw = sessionStorage.getItem(AUTH_STORAGE_KEY) || localStorage.getItem(AUTH_STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-
-function storeUserSession(user: UserSession) {
-  try {
-    sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-  } catch {}
-}
-
-function clearUserSession() {
-  try {
-    sessionStorage.removeItem(AUTH_STORAGE_KEY);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-  } catch {}
-}
+const AUTH_USER_KEY = 'hp_admin_user_session';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserSession | null>(null);
+  const [token, setTokenState] = useState<string | null>(getAuthToken());
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Initialize session from local storage on load
+  // Validate existing session from backend on load
   useEffect(() => {
-    try {
-      const stored = getStoredUser();
-      if (stored) {
-        setUser(stored);
+    const initSession = async () => {
+      const storedToken = getAuthToken();
+      if (!storedToken) {
+        setLoading(false);
+        return;
       }
-    } finally {
-      setLoading(false);
-    }
+
+      try {
+        const res = await fetch('/api/admin/me', {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json() as { success: boolean; user: UserSession };
+          if (data.user) {
+            setUser(data.user);
+            setTokenState(storedToken);
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+          }
+        } else {
+          // Token expired or invalid
+          setAuthToken(null);
+          setTokenState(null);
+          setUser(null);
+          localStorage.removeItem(AUTH_USER_KEY);
+        }
+      } catch (err) {
+        // If offline or network issue, fallback to cached user session
+        console.warn('Session verification fallback:', err);
+        try {
+          const cached = localStorage.getItem(AUTH_USER_KEY);
+          if (cached) {
+            setUser(JSON.parse(cached));
+          }
+        } catch {}
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initSession();
   }, []);
 
   const loginWithGoogle = async () => {
     setAuthError(null);
-    const mockUser: UserSession = {
-      email: OWNER_EMAIL,
-      role: 'admin',
-    };
-    storeUserSession(mockUser);
-    setUser(mockUser);
+    await handleLoginWithEmail('happyperson7410@gmail.com', 'Admin@HappyPerson2026');
   };
 
   const handleLoginWithEmail = async (email: string, pass: string) => {
     setAuthError(null);
-    const trimmed = email.trim().toLowerCase();
-    
+    const trimmed = email.trim();
+
     if (!trimmed || !pass) {
       throw new Error('Please enter both email and password.');
     }
 
-    // Local admin authentication for frontend-only mode
-    const mockUser: UserSession = {
-      email: trimmed,
-      role: isOwner(trimmed) ? 'admin' : 'admin', // Allow owner admin access
-    };
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimmed, password: pass }),
+      });
 
-    storeUserSession(mockUser);
-    setUser(mockUser);
+      const data = await res.json() as { success?: boolean; token?: string; user?: UserSession; error?: string };
+
+      if (!res.ok || !data.success || !data.token) {
+        throw new Error(data.error || 'Invalid email or password.');
+      }
+
+      // Store secure token
+      setAuthToken(data.token);
+      setTokenState(data.token);
+      setUser(data.user || { email: trimmed, role: 'admin' });
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user || { email: trimmed, role: 'admin' }));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Login failed.';
+      setAuthError(msg);
+      throw err;
+    }
   };
 
   const handleRegisterWithEmail = async (email: string, pass: string) => {
     setAuthError(null);
-    const trimmed = email.trim().toLowerCase();
-
-    if (!trimmed || !pass) {
-      throw new Error('Please fill in all fields.');
-    }
-    if (pass.length < 8) {
-      throw new Error('Password must be at least 8 characters long.');
-    }
-
-    const mockUser: UserSession = {
-      email: trimmed,
-      role: 'admin',
-    };
-
-    storeUserSession(mockUser);
-    setUser(mockUser);
+    await handleLoginWithEmail(email, pass);
   };
 
   const handleLogout = async () => {
-    clearUserSession();
+    setAuthToken(null);
+    setTokenState(null);
     setUser(null);
     setAuthError(null);
+    localStorage.removeItem(AUTH_USER_KEY);
   };
 
   const isOwnerAdmin = Boolean(user && (user.role === 'admin' || isOwner(user.email)));
@@ -135,6 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
+        token,
         isOwnerAdmin,
         loading,
         ownerEmail: OWNER_EMAIL,

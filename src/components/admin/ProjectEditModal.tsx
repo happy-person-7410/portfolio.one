@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, Save, AlertCircle, Sparkles, Image, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
 import { Project, ProjectCategory } from '../../types';
 import { saveProject } from '../../services/portfolioService';
+import { ImageUploader } from './ImageUploader';
+import { MultiImageUploader } from './MultiImageUploader';
 
 interface ProjectEditModalProps {
   project?: Project | null;
@@ -12,12 +14,12 @@ interface ProjectEditModalProps {
 }
 
 const PRESET_MOCKUPS = [
-  { label: 'Dental Clinic Mockup', url: '/src/assets/images/dental_clinic_mockup_1792086718777.jpg' },
-  { label: 'Restaurant Mockup', url: '/src/assets/images/restaurant_mockup_1792086719466.jpg' },
-  { label: 'Real Estate Mockup', url: '/src/assets/images/realestate_mockup_1792086719579.jpg' },
-  { label: 'SaaS Dashboard Mockup', url: '/src/assets/images/saas_dashboard_mockup_1792086720504.jpg' },
-  { label: 'Studio Mascot Banner', url: '/src/assets/images/happy_person_banner_1792166219172.jpg' },
-  { label: 'Mascot Avatar', url: '/src/assets/images/happy_person_mascot_1792166218374.jpg' },
+  { label: 'Dental Clinic Hero', url: '/images/projects/dental-clinic-hero.webp' },
+  { label: 'Restaurant Hero', url: '/images/projects/restaurant-hero.webp' },
+  { label: 'Real Estate Hero', url: '/images/projects/real-estate-hero.webp' },
+  { label: 'SaaS Dashboard Hero', url: '/images/projects/saas-dashboard-hero.webp' },
+  { label: 'Panoramic Studio Banner', url: '/images/banners/happy-person-banner.webp' },
+  { label: 'Mascot Brand Badge', url: '/images/brand/happy-person-mascot.webp' },
 ];
 
 export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
@@ -36,6 +38,13 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
   const [client, setClient] = useState(project?.client || '');
   const [duration, setDuration] = useState(project?.duration || '2 Weeks');
   const [thumbnail, setThumbnail] = useState(project?.thumbnail || PRESET_MOCKUPS[0].url);
+  const [screenshots, setScreenshots] = useState<string[]>(
+    project?.screenshots && project.screenshots.length > 0
+      ? project.screenshots
+      : project?.thumbnail
+      ? [project.thumbnail]
+      : [PRESET_MOCKUPS[0].url]
+  );
   const [previewVideoUrl, setPreviewVideoUrl] = useState(project?.previewVideoUrl || '');
   const [liveDemoUrl, setLiveDemoUrl] = useState(project?.liveDemoUrl || '');
   const [problem, setProblem] = useState(project?.problem || '');
@@ -77,7 +86,7 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
       solution: solution.trim() || 'Designed and developed a fast, modern digital experience.',
       tags: tags.length ? tags : ['React', 'TypeScript', 'Tailwind CSS'],
       features: features.length ? features : ['Responsive UI', 'Modern Architecture'],
-      screenshots: project?.screenshots || [thumbnail.trim()],
+      screenshots: screenshots.length ? screenshots : [thumbnail.trim()],
       featured,
       hidden,
       order: Number(order) || 1,
@@ -264,31 +273,33 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">Thumbnail / Hero Image URL *</label>
-              <input
-                type="text"
-                required
-                value={thumbnail}
-                onChange={(e) => setThumbnail(e.target.value)}
-                placeholder="/src/assets/images/dental_clinic_mockup_... or https://..."
-                className="w-full px-3.5 py-2.5 bg-slate-800/70 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+            {/* Direct Thumbnail Uploader */}
+            <ImageUploader
+              value={thumbnail}
+              onChange={(url) => {
+                setThumbnail(url);
+                if (url && !screenshots.includes(url)) {
+                  setScreenshots([url, ...screenshots]);
+                }
+              }}
+              folder="projects"
+              label="Primary Thumbnail / Hero Image *"
+              description="Upload directly from computer to repository /public/images/projects/. Automatic WebP compression."
+              aspectRatio="wide"
+              recommendedDimensions="1200 × 750px"
+              presetChoices={PRESET_MOCKUPS}
+            />
 
-              {/* Preset Chooser */}
-              <div className="mt-2.5 flex flex-wrap items-center gap-2">
-                <span className="text-[11px] text-slate-500">Pick Studio Asset:</span>
-                {PRESET_MOCKUPS.map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    onClick={() => setThumbnail(preset.url)}
-                    className="text-[11px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer border border-slate-700/60"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
+            {/* Gallery Multi-Screenshot Uploader */}
+            <div className="pt-2">
+              <MultiImageUploader
+                screenshots={screenshots}
+                onChange={setScreenshots}
+                mainThumbnail={thumbnail}
+                onSetMainThumbnail={setThumbnail}
+                folder="projects/screenshots"
+                label="Project Screenshots Gallery"
+              />
             </div>
 
             <div>

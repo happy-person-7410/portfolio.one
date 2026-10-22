@@ -40,7 +40,7 @@ export const BeforeAfter: React.FC = () => {
       headline: 'From Phone Tag Chaos to Automated Online Patient Intake',
       before: {
         title: 'Legacy 2016 Static Website',
-        image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&auto=format&fit=crop&q=80',
+        image: '/images/before-after/dental-before.jpg',
         speed: '4.8s Slow Load',
         mobileScore: '42 / 100 Mobile',
         conversion: '1.2% Conversion',
@@ -53,7 +53,7 @@ export const BeforeAfter: React.FC = () => {
       },
       after: {
         title: 'Happy Person Modern Redesign',
-        image: '/src/assets/images/dental_clinic_mockup_1792086718777.jpg',
+        image: '/images/before-after/dental-after.webp',
         speed: '0.8s Ultra Fast',
         mobileScore: '99 / 100 Mobile',
         conversion: '4.9% (+308%)',
@@ -73,7 +73,7 @@ export const BeforeAfter: React.FC = () => {
       headline: 'Replacing Downloadable PDF Menus with Instant Table Reservations',
       before: {
         title: 'Outdated Food Blog Template',
-        image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
+        image: '/images/before-after/restaurant-before.jpg',
         speed: '5.2s Heavy Assets',
         mobileScore: '38 / 100 Mobile',
         conversion: '0.9% Bookings',
@@ -86,7 +86,7 @@ export const BeforeAfter: React.FC = () => {
       },
       after: {
         title: 'Happy Person Atmospheric Dining Portal',
-        image: '/src/assets/images/restaurant_mockup_1792086719466.jpg',
+        image: '/images/before-after/restaurant-after.webp',
         speed: '0.9s Blazing Fast',
         mobileScore: '98 / 100 Mobile',
         conversion: '4.4% (+388%)',
@@ -106,7 +106,7 @@ export const BeforeAfter: React.FC = () => {
       headline: 'Transforming Static Spreadsheets into High-End Property Showcases',
       before: {
         title: 'Generic Agent Subpage',
-        image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&auto=format&fit=crop&q=80',
+        image: '/images/before-after/realestate-before.jpg',
         speed: '3.9s Cluttered Scripts',
         mobileScore: '51 / 100 Mobile',
         conversion: '1.4% Inquiries',
@@ -119,7 +119,7 @@ export const BeforeAfter: React.FC = () => {
       },
       after: {
         title: 'Happy Person Editorial Property Platform',
-        image: '/src/assets/images/realestate_mockup_1792086719579.jpg',
+        image: '/images/before-after/realestate-after.webp',
         speed: '0.7s Instant Load',
         mobileScore: '100 / 100 Mobile',
         conversion: '5.2% (+271%)',
@@ -222,6 +222,9 @@ export const BeforeAfter: React.FC = () => {
                     <img
                       src={currentCase.before.image}
                       alt={`${currentCase.client} before redesign`}
+                      width={640}
+                      height={400}
+                      loading="lazy"
                       className="w-full h-full object-cover filter grayscale-40"
                     />
                     <div className="absolute inset-0 bg-red-950/20 backdrop-blur-[0.5px]" />
@@ -284,6 +287,9 @@ export const BeforeAfter: React.FC = () => {
                     <img
                       src={currentCase.after.image}
                       alt={`${currentCase.client} after redesign by Happy Person`}
+                      width={640}
+                      height={400}
+                      loading="lazy"
                       className="w-full h-full object-cover object-top"
                     />
                     <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-md bg-blue-600/90 backdrop-blur-md text-[11px] text-white font-semibold">

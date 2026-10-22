@@ -4,38 +4,24 @@ import { PROJECTS } from '../data/portfolioData';
 import { Project, ProjectCategory } from '../types';
 import { ProjectModal } from './ProjectModal';
 import { SectionHeader } from './ui/SectionHeader';
-import { usePortfolioData } from '../context/PortfolioDataContext';
+import { useProjects } from '../hooks';
+import { ProjectsSkeleton } from './skeletons';
 
 export const Projects: React.FC = () => {
-  const { projects } = usePortfolioData();
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const {
+    projects,
+    visibleProjects,
+    filteredProjects,
+    categories,
+    selectedCategory,
+    setSelectedCategory,
+    isLoading,
+    error,
+    refresh,
+  } = useProjects();
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalInitialTab, setModalInitialTab] = useState<'overview' | 'interactive' | 'gallery'>('overview');
-
-  const categories: string[] = [
-    'All',
-    'Business',
-    'Booking',
-    'Restaurant',
-    'Real Estate',
-    'E-commerce',
-    'Dashboard'
-  ];
-
-  const visibleProjects = useMemo(() => {
-    return projects.filter((p) => !p.hidden);
-  }, [projects]);
-
-  const filteredProjects = useMemo(() => {
-    if (selectedCategory === 'All') return visibleProjects;
-    return visibleProjects.filter((p) => {
-      if (selectedCategory === 'Business') return p.category.includes('Business');
-      if (selectedCategory === 'Booking') return p.category.includes('Booking');
-      if (selectedCategory === 'Dashboard') return p.category.includes('Dashboard');
-      return p.category === selectedCategory;
-    });
-  }, [selectedCategory, visibleProjects]);
 
   // Clean URL synchronization (/work/project-id)
   useEffect(() => {
@@ -124,6 +110,26 @@ export const Projects: React.FC = () => {
             </button>
           ))}
         </div>
+
+        {/* Loading Skeletons */}
+        {isLoading && projects.length === 0 && (
+          <div className="mb-12">
+            <ProjectsSkeleton count={4} />
+          </div>
+        )}
+
+        {/* Error State with Retry */}
+        {error && projects.length === 0 && (
+          <div className="p-8 text-center rounded-3xl border border-amber-500/20 bg-amber-500/5 my-8">
+            <p className="text-sm text-amber-500 mb-3">{error}</p>
+            <button
+              onClick={() => refresh()}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
+            >
+              Retry Connection
+            </button>
+          </div>
+        )}
 
         {/* 8 Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 lg:gap-10">
