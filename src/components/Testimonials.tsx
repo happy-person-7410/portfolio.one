@@ -1,10 +1,11 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
-import { usePortfolioData } from '../context/PortfolioDataContext';
+import { useTestimonials } from '../hooks';
+import { TestimonialsSkeleton } from './skeletons';
 
 export const Testimonials: React.FC = () => {
-  const { testimonials } = usePortfolioData();
+  const { testimonials, isLoading } = useTestimonials();
   return (
     <section id="testimonials" className="py-20 md:py-28 transition-colors" aria-label="Client Testimonials">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,8 +18,11 @@ export const Testimonials: React.FC = () => {
         />
 
         {/* 3 Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((t) => (
+        {isLoading && testimonials.length === 0 ? (
+          <TestimonialsSkeleton count={3} />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((t) => (
             <div
               key={t.id}
               className="bg-white dark:bg-[#111726] rounded-2xl p-7 border border-neutral-200/90 dark:border-[#1e293b] shadow-2xs hover:shadow-md transition-all flex flex-col justify-between hover-lift"
@@ -73,6 +77,7 @@ export const Testimonials: React.FC = () => {
             </div>
           ))}
         </div>
+      )}
 
       </div>
     </section>

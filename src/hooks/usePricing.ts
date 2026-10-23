@@ -22,7 +22,7 @@ export const usePricing = () => {
   }, [refreshData]);
 
   const popularPlan = useMemo(() => {
-    return pricingPlans.find((p) => p.isPopular) || pricingPlans[1] || pricingPlans[0];
+    return pricingPlans.find((p) => p.isRecommended) || pricingPlans[1] || pricingPlans[0];
   }, [pricingPlans]);
 
   return {

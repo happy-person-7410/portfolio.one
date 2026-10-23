@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { Project, Service, PricingPlan, Testimonial, FaqItem, SiteProfile } from '../types';
+import { Project, Service, PricingPlan, Testimonial, FaqItem, SiteProfile, AddonService } from '../types';
 import { CreativeItem } from '../data/creativeData';
 import {
   PROJECTS as DEFAULT_PROJECTS,
@@ -10,6 +10,7 @@ import {
   PROFILE_INFO as DEFAULT_PROFILE,
 } from '../data/portfolioData';
 import { CREATIVE_ITEMS as DEFAULT_CREATIVE } from '../data/creativeData';
+import { ADDON_SERVICES as DEFAULT_ADDONS } from '../data/pricingData';
 import {
   subscribeToProjects,
   subscribeToServices,
@@ -25,6 +26,7 @@ import {
   fetchTestimonials,
   fetchFaqs,
   fetchSiteProfile,
+  fetchAddons,
 } from '../services/portfolioService';
 
 interface PortfolioDataContextType {
@@ -32,6 +34,7 @@ interface PortfolioDataContextType {
   creativeWorks: CreativeItem[];
   services: Service[];
   pricingPlans: PricingPlan[];
+  addons: AddonService[];
   testimonials: Testimonial[];
   faqs: FaqItem[];
   profile: SiteProfile;
@@ -48,6 +51,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [creativeWorks, setCreativeWorks] = useState<CreativeItem[]>(DEFAULT_CREATIVE);
   const [services, setServices] = useState<Service[]>(DEFAULT_SERVICES);
   const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>(DEFAULT_PRICING);
+  const [addons, setAddons] = useState<AddonService[]>(DEFAULT_ADDONS);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
   const [faqs, setFaqs] = useState<FaqItem[]>(DEFAULT_FAQS.map((f, i) => ({ id: `faq-${i + 1}`, ...f, order: i + 1 })));
   const [profile, setProfile] = useState<SiteProfile>(DEFAULT_PROFILE);
@@ -59,11 +63,12 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     setError(null);
     try {
-      const [p, c, s, pr, t, f, prof] = await Promise.allSettled([
+      const [p, c, s, pr, add, t, f, prof] = await Promise.allSettled([
         fetchProjects(),
         fetchCreativeWorks(),
         fetchServices(),
         fetchPricing(),
+        fetchAddons(),
         fetchTestimonials(),
         fetchFaqs(),
         fetchSiteProfile(),
@@ -73,6 +78,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
       if (c.status === 'fulfilled' && c.value?.length) setCreativeWorks(c.value);
       if (s.status === 'fulfilled' && s.value?.length) setServices(s.value);
       if (pr.status === 'fulfilled' && pr.value?.length) setPricingPlans(pr.value);
+      if (add.status === 'fulfilled' && add.value?.length) setAddons(add.value);
       if (t.status === 'fulfilled' && t.value?.length) setTestimonials(t.value);
       if (f.status === 'fulfilled' && f.value?.length) setFaqs(f.value);
       if (prof.status === 'fulfilled' && prof.value) setProfile((prev) => ({ ...prev, ...prof.value }));
@@ -149,6 +155,11 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         unsubs.push(unsubProfile);
 
+        // 8. Addons
+        fetchAddons().then((items) => {
+          if (items && items.length > 0) setAddons(items);
+        }).catch(() => {});
+
       } catch (err) {
         console.warn('Error loading portfolio data:', err);
         setIsLoading(false);
@@ -169,6 +180,7 @@ export const PortfolioDataProvider: React.FC<{ children: React.ReactNode }> = ({
         creativeWorks,
         services,
         pricingPlans,
+        addons,
         testimonials,
         faqs,
         profile,

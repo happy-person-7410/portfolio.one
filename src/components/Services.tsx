@@ -14,14 +14,15 @@ import {
 } from 'lucide-react';
 import { Service } from '../types';
 import { SectionHeader } from './ui/SectionHeader';
-import { usePortfolioData } from '../context/PortfolioDataContext';
+import { useServices } from '../hooks';
+import { ServicesSkeleton } from './skeletons';
 
 interface ServicesProps {
   onRequestService: (serviceName: string) => void;
 }
 
 export const Services: React.FC<ServicesProps> = ({ onRequestService }) => {
-  const { services } = usePortfolioData();
+  const { services, isLoading } = useServices();
   const getIcon = (iconName: string) => {
     switch (iconName) {
       case 'Globe':
@@ -62,9 +63,13 @@ export const Services: React.FC<ServicesProps> = ({ onRequestService }) => {
           }
         />
 
-        {/* 8 Services Grid: 4 columns on large desktop, 2 on tablet, 1 on mobile */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {services.map((service: Service) => {
+        {/* Loading Skeletons */}
+        {isLoading && services.length === 0 ? (
+          <ServicesSkeleton count={8} />
+        ) : (
+          /* 8 Services Grid: 4 columns on large desktop, 2 on tablet, 1 on mobile */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {services.map((service: Service) => {
             const Icon = getIcon(service.iconName);
             const isAiService = service.id === 'ai-image-video';
 
@@ -134,6 +139,7 @@ export const Services: React.FC<ServicesProps> = ({ onRequestService }) => {
             );
           })}
         </div>
+      )}
 
       </div>
     </section>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Sparkles, Check, Plus, MessageSquare, ArrowRight, ShieldCheck } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
-import { ADDON_SERVICES } from '../data/pricingData';
+import { useAddons } from '../hooks';
+import { AddOnsSkeleton } from './skeletons';
 import { CONTACT_CONFIG } from '../data/contactConfig';
 import { MessengerIcon } from './icons/MessengerIcon';
 
@@ -10,6 +11,7 @@ interface AddOnsProps {
 }
 
 export const AddOns: React.FC<AddOnsProps> = ({ onSelectAddons }) => {
+  const { addons, isLoading, error, refresh } = useAddons();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const toggleAddon = (id: string) => {
@@ -18,7 +20,7 @@ export const AddOns: React.FC<AddOnsProps> = ({ onSelectAddons }) => {
     );
   };
 
-  const selectedItems = ADDON_SERVICES.filter((item) => selectedIds.includes(item.id));
+  const selectedItems = addons.filter((item) => selectedIds.includes(item.id));
 
   // Compute total starting price for chosen add-ons
   const parsePrice = (priceStr: string) => {
@@ -48,8 +50,11 @@ export const AddOns: React.FC<AddOnsProps> = ({ onSelectAddons }) => {
         />
 
         {/* 7 Add-ons Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-12">
-          {ADDON_SERVICES.map((addon) => {
+        {isLoading && addons.length === 0 ? (
+          <AddOnsSkeleton count={7} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-12">
+            {addons.map((addon) => {
             const isSelected = selectedIds.includes(addon.id);
 
             return (
@@ -113,6 +118,7 @@ export const AddOns: React.FC<AddOnsProps> = ({ onSelectAddons }) => {
             );
           })}
         </div>
+      )}
 
         {/* Selected Addons Sticky/Dynamic Summary Strip */}
         <div className="p-6 sm:p-8 rounded-3xl bg-neutral-100/80 dark:bg-[#111726] border border-neutral-200/90 dark:border-[#1e293b] shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">

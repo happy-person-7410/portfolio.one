@@ -1,6 +1,6 @@
 import { ArrowRight, Sparkles, Code2, Laptop, CalendarCheck, BarChart3, Bot, HeartHandshake, ExternalLink, MessageSquare, Facebook, Mail } from 'lucide-react';
 import { Button } from './ui/Button';
-import { usePortfolioData } from '../context/PortfolioDataContext';
+import { useSiteProfile } from '../hooks';
 import { MessengerIcon } from './icons/MessengerIcon';
 import { CONTACT_CONFIG } from '../data/contactConfig';
 
@@ -10,11 +10,11 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ onViewWorkClick, onHireMeClick }) => {
-  const { profile } = usePortfolioData();
-  const messengerLink = profile.messengerUrl || CONTACT_CONFIG.messengerUrl;
-  const whatsappLink = profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl;
-  const facebookPageLink = profile.facebookPageUrl || CONTACT_CONFIG.facebookPageUrl;
-  const emailLink = `mailto:${profile.email || CONTACT_CONFIG.email}`;
+  const { profile, messengerUrl, whatsappUrl, facebookPageUrl, email } = useSiteProfile();
+  const messengerLink = messengerUrl || CONTACT_CONFIG.messengerUrl;
+  const whatsappLink = whatsappUrl || CONTACT_CONFIG.whatsAppUrl;
+  const facebookPageLink = facebookPageUrl || CONTACT_CONFIG.facebookPageUrl;
+  const emailLink = `mailto:${email || CONTACT_CONFIG.email}`;
   const capabilities = [
     { label: "Web UI Design", icon: Laptop },
     { label: "Responsive Websites", icon: Code2 },

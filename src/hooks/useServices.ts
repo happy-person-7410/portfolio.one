@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import { Service } from '../types';
 import { fetchServices } from '../services/portfolioService';
@@ -21,15 +21,8 @@ export const useServices = () => {
     }
   }, [refreshData]);
 
-  // Group services by category if needed
-  const categories = useMemo(() => {
-    const set = new Set(services.map((s) => s.category));
-    return Array.from(set);
-  }, [services]);
-
   return {
     services,
-    categories,
     isLoading: isLoading || isRefreshing,
     error: fetchError || error,
     refresh,

@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, Eye, Laptop } from 'lucide-react';
-import { PROJECTS } from '../data/portfolioData';
 import { Project, ProjectCategory } from '../types';
 import { ProjectModal } from './ProjectModal';
 import { SectionHeader } from './ui/SectionHeader';
 import { useProjects } from '../hooks';
 import { ProjectsSkeleton } from './skeletons';
+import { fetchProjectBySlug } from '../services/portfolioService';
 
 export const Projects: React.FC = () => {
   const {
@@ -25,7 +25,7 @@ export const Projects: React.FC = () => {
 
   // Clean URL synchronization (/work/project-id)
   useEffect(() => {
-    const handleLocationChange = () => {
+    const handleLocationChange = async () => {
       const path = window.location.pathname;
       if (path.startsWith('/work/')) {
         const slug = path.replace('/work/', '').trim();
@@ -34,6 +34,18 @@ export const Projects: React.FC = () => {
           setActiveProject(found);
           setIsModalOpen(true);
           document.title = `${found.title} | Case Study by Happy Person`;
+        }
+
+        // Fetch individual project from /api/projects/:slug
+        try {
+          const detail = await fetchProjectBySlug(slug);
+          if (detail) {
+            setActiveProject(detail);
+            setIsModalOpen(true);
+            document.title = `${detail.title} | Case Study by Happy Person`;
+          }
+        } catch (err) {
+          console.warn('Single project fetch note:', err);
         }
       } else if (path === '/' || path === '') {
         if (isModalOpen) {
@@ -50,13 +62,21 @@ export const Projects: React.FC = () => {
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, [visibleProjects, isModalOpen]);
 
-  const handleOpenDetails = (project: Project, tab: 'overview' | 'interactive' | 'gallery' = 'overview') => {
+  const handleOpenDetails = async (project: Project, tab: 'overview' | 'interactive' | 'gallery' = 'overview') => {
     setActiveProject(project);
     setModalInitialTab(tab);
     setIsModalOpen(true);
     // Push clean URL to browser history
     window.history.pushState({ projectId: project.id }, '', `/work/${project.id}`);
     document.title = `${project.title} | Case Study by Happy Person`;
+
+    // Fetch latest individual project from /api/projects/:slug
+    try {
+      const detail = await fetchProjectBySlug(project.id);
+      if (detail) {
+        setActiveProject((prev: Project | null) => (prev?.id === project.id ? { ...prev, ...detail } : prev));
+      }
+    } catch {}
   };
 
   const handleCloseModal = () => {

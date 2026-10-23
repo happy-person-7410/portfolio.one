@@ -3,7 +3,7 @@
  * Connects frontend components to the Neon PostgreSQL backend via Cloudflare Pages Functions (/api/*).
  */
 
-import { Project, Service, PricingPlan, Testimonial, FaqItem, SiteProfile } from '../types';
+import { Project, Service, PricingPlan, Testimonial, FaqItem, SiteProfile, AddonService } from '../types';
 import { CreativeItem } from '../data/creativeData';
 import {
   PROJECTS as DEFAULT_PROJECTS,
@@ -14,6 +14,7 @@ import {
   PROFILE_INFO as DEFAULT_PROFILE,
 } from '../data/portfolioData';
 import { CREATIVE_ITEMS as DEFAULT_CREATIVE } from '../data/creativeData';
+import { ADDON_SERVICES as DEFAULT_ADDONS } from '../data/pricingData';
 import { compressImage, sanitizeFilename, fileToDataUrl } from '../utils/imageCompressor';
 
 // Local storage fallback cache keys
@@ -222,6 +223,22 @@ export async function deleteProject(projectId: string): Promise<void> {
   }
 }
 
+export async function fetchProjectBySlug(slug: string): Promise<Project | null> {
+  try {
+    const res = await fetch(`/api/projects/${encodeURIComponent(slug)}`);
+    if (res.ok) {
+      const data = await res.json() as Project;
+      if (data && data.id) {
+        return data;
+      }
+    }
+  } catch (err) {
+    console.warn(`API /api/projects/${slug} fetch failed, using memory/fallback:`, err);
+  }
+  const current = await fetchProjects();
+  return current.find((p) => p.id === slug || (p as { slug?: string }).slug === slug) || null;
+}
+
 // ----------------- Creative Works API -----------------
 
 export async function fetchCreativeWorks(): Promise<CreativeItem[]> {
@@ -405,6 +422,23 @@ export async function savePricingPlan(plan: PricingPlan): Promise<void> {
   } catch (err) {
     console.warn('Failed to save pricing on server:', err);
   }
+}
+
+// ----------------- Add-ons API -----------------
+
+export async function fetchAddons(): Promise<AddonService[]> {
+  try {
+    const res = await fetch('/api/add-ons');
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    const data = await res.json() as AddonService[];
+    if (Array.isArray(data) && data.length > 0) {
+      writeLocal('hp_portfolio_addons', data);
+      return data;
+    }
+  } catch (err) {
+    console.warn('API /api/add-ons failed, using fallback:', err);
+  }
+  return readLocal<AddonService[]>('hp_portfolio_addons', DEFAULT_ADDONS);
 }
 
 // ----------------- Testimonials API -----------------

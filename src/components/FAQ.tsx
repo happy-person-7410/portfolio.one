@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
-import { usePortfolioData } from '../context/PortfolioDataContext';
+import { useFaqs } from '../hooks';
+import { FaqSkeleton } from './skeletons';
 
 export const FAQ: React.FC = () => {
-  const { faqs } = usePortfolioData();
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const toggleAccordion = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+  const { faqs, openIndex, toggleAccordion, isLoading } = useFaqs(0);
 
   return (
     <section id="faq" className="py-20 md:py-28 transition-colors" aria-label="Frequently Asked Questions">
@@ -24,8 +20,11 @@ export const FAQ: React.FC = () => {
         />
 
         {/* Accordion List */}
-        <div className="space-y-4">
-          {faqs.map((item, index) => {
+        {isLoading && faqs.length === 0 ? (
+          <FaqSkeleton count={5} />
+        ) : (
+          <div className="space-y-4">
+            {faqs.map((item, index) => {
             const isOpen = openIndex === index;
             return (
               <div
@@ -55,6 +54,7 @@ export const FAQ: React.FC = () => {
             );
           })}
         </div>
+      )}
 
         {/* Extra help box */}
         <div className="mt-12 p-6 rounded-2xl bg-white dark:bg-[#111726] border border-neutral-200/80 dark:border-[#1e293b] text-center shadow-2xs">

@@ -1,15 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import { Sparkles, Play, ExternalLink, X, Eye, Video, Palette, Image as ImageIcon, Layout, CheckCircle2 } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
-import { CREATIVE_ITEMS, CreativeCategory, CreativeItem } from '../data/creativeData';
+import { CreativeCategory, CreativeItem } from '../data/creativeData';
 import { CONTACT_CONFIG } from '../data/contactConfig';
 import { MessengerIcon } from './icons/MessengerIcon';
-import { usePortfolioData } from '../context/PortfolioDataContext';
+import { useCreativeWorks } from '../hooks';
+import { CreativeWorkSkeleton } from './skeletons';
 
 export const CreativeWork: React.FC = () => {
-  const { creativeWorks, isLoading } = usePortfolioData();
-  const [selectedTab, setSelectedTab] = useState<CreativeCategory | 'All'>('Logos & Branding');
-  const [previewItem, setPreviewItem] = useState<CreativeItem | null>(null);
+  const {
+    filteredWorks: filteredItems,
+    selectedTab,
+    setSelectedTab,
+    previewItem,
+    setPreviewItem,
+    isLoading,
+    creativeWorks,
+  } = useCreativeWorks({ initialCategory: 'Logos & Branding' });
 
   const tabs: Array<{ id: CreativeCategory | 'All'; label: string; icon: React.FC<{ className?: string }> }> = [
     { id: 'Logos & Branding', label: 'Logos & Branding', icon: Palette },
@@ -17,13 +24,6 @@ export const CreativeWork: React.FC = () => {
     { id: 'AI Images', label: 'AI Images', icon: ImageIcon },
     { id: 'AI Videos', label: 'AI Videos', icon: Video },
   ];
-
-  const itemsToDisplay = creativeWorks && creativeWorks.length > 0 ? creativeWorks : CREATIVE_ITEMS;
-
-  const filteredItems = useMemo(() => {
-    if (selectedTab === 'All') return itemsToDisplay;
-    return itemsToDisplay.filter((item) => item.category === selectedTab);
-  }, [selectedTab, itemsToDisplay]);
 
   return (
     <section id="creative" className="py-20 md:py-28 bg-white dark:bg-[#0b0f17] transition-colors" aria-label="Creative and AI Work Gallery">
@@ -62,9 +62,13 @@ export const CreativeWork: React.FC = () => {
           </div>
         </div>
 
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredItems.map((item) => {
+        {/* Loading Skeletons */}
+        {isLoading && creativeWorks.length === 0 ? (
+          <CreativeWorkSkeleton count={6} />
+        ) : (
+          /* Gallery Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredItems.map((item) => {
             const isVideo = item.category === 'AI Videos';
 
             return (
@@ -218,6 +222,7 @@ export const CreativeWork: React.FC = () => {
             );
           })}
         </div>
+      )}
 
       </div>
 

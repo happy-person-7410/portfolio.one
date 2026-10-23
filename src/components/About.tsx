@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { FileText, Sparkles, CheckCircle2, Layers, Cpu, Compass, HeartHandshake, Smile } from 'lucide-react';
 import { PROFILE_INFO } from '../data/portfolioData';
-import { usePortfolioData } from '../context/PortfolioDataContext';
+import { useSiteProfile } from '../hooks';
 import { ResumeModal } from './ResumeModal';
 import { SectionHeader } from './ui/SectionHeader';
 import { Button } from './ui/Button';
 
 export const About: React.FC = () => {
-  const { profile } = usePortfolioData();
+  const { profile } = useSiteProfile();
   const [resumeOpen, setResumeOpen] = useState(false);
 
   const factIcons = [Layers, Cpu, Compass, HeartHandshake];

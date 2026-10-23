@@ -1,7 +1,8 @@
 import React from 'react';
 import { Check, ArrowRight, Sparkles, MessageSquare, Facebook, ExternalLink, ShieldCheck, Mail } from 'lucide-react';
 import { SectionHeader } from './ui/SectionHeader';
-import { usePortfolioData } from '../context/PortfolioDataContext';
+import { usePricing, useSiteProfile } from '../hooks';
+import { PricingSkeleton } from './skeletons';
 import { MessengerIcon } from './icons/MessengerIcon';
 import { ADDON_SERVICES, PRICING_DISCLAIMER_NOTE } from '../data/pricingData';
 import { CONTACT_CONFIG } from '../data/contactConfig';
@@ -11,11 +12,12 @@ interface PricingProps {
 }
 
 export const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
-  const { pricingPlans, profile } = usePortfolioData();
-  const messengerLink = profile.messengerUrl || CONTACT_CONFIG.messengerUrl;
-  const whatsappLink = profile.whatsappUrl || CONTACT_CONFIG.whatsAppUrl;
-  const facebookPageLink = profile.facebookPageUrl || CONTACT_CONFIG.facebookPageUrl;
-  const emailLink = `mailto:${profile.email || CONTACT_CONFIG.email}`;
+  const { pricingPlans, isLoading } = usePricing();
+  const { messengerUrl, whatsappUrl, facebookPageUrl, email } = useSiteProfile();
+  const messengerLink = messengerUrl || CONTACT_CONFIG.messengerUrl;
+  const whatsappLink = whatsappUrl || CONTACT_CONFIG.whatsAppUrl;
+  const facebookPageLink = facebookPageUrl || CONTACT_CONFIG.facebookPageUrl;
+  const emailLink = `mailto:${email || CONTACT_CONFIG.email}`;
 
   return (
     <section id="pricing" className="py-20 md:py-28 bg-neutral-100/60 dark:bg-[#0e1422] border-y border-neutral-200/80 dark:border-[#1e293b] transition-colors" aria-label="Pricing Packages">
@@ -56,8 +58,11 @@ export const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
         </div>
 
         {/* 3 Core Packages Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-16">
-          {pricingPlans.map((plan) => (
+        {isLoading && pricingPlans.length === 0 ? (
+          <PricingSkeleton count={3} />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-16">
+            {pricingPlans.map((plan) => (
             <div
               key={plan.id}
               className={`relative rounded-3xl p-8 transition-all flex flex-col justify-between ${
@@ -138,6 +143,7 @@ export const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
             </div>
           ))}
         </div>
+      )}
 
         {/* Link to Dedicated Section 8: Add-Ons */}
         <div className="pt-8 border-t border-neutral-200/80 dark:border-[#1e293b] flex flex-col sm:flex-row items-center justify-between gap-4 mb-12">

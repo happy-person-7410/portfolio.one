@@ -3,6 +3,7 @@ export { useProjects } from './useProjects';
 export { useCreativeWorks } from './useCreativeWorks';
 export { useServices } from './useServices';
 export { usePricing } from './usePricing';
+export { useAddons } from './useAddons';
 export { useTestimonials } from './useTestimonials';
 export { useFaqs } from './useFaqs';
 export { useSiteProfile } from './useSiteProfile';
