@@ -228,7 +228,7 @@ export const AssetInventoryView: React.FC = () => {
           </span>
         </div>
         <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800/80">
-          <span className="text-[11px] font-medium text-slate-400">Used in Neon DB</span>
+          <span className="text-[11px] font-medium text-slate-400">Used in Firestore DB</span>
           <p className="text-2xl font-bold text-blue-400 mt-1">{dbUsedCount}</p>
           <span className="text-[10px] text-slate-400 mt-0.5">Projects, Creative & Banners</span>
         </div>
@@ -313,7 +313,7 @@ export const AssetInventoryView: React.FC = () => {
                     </span>
                     {asset.usedInDatabase && (
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-500/90 text-white backdrop-blur-md shadow-sm">
-                        In Neon DB
+                        In Firestore
                       </span>
                     )}
                   </div>

@@ -970,7 +970,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                 <div>
                   <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Client Contact Requests & Inquiries</h1>
                   <p className="text-xs text-slate-400 mt-1">
-                    Direct inquiries saved securely in your Neon PostgreSQL database from the website contact form.
+                    Direct inquiries saved securely in your Cloud Firestore database from the website contact form.
                   </p>
                 </div>
                 <button
@@ -985,7 +985,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
               {loadingInquiries ? (
                 <div className="py-16 text-center text-slate-500">
                   <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                  <p className="text-xs">Loading inquiries from Neon database...</p>
+                  <p className="text-xs">Loading inquiries from Firestore database...</p>
                 </div>
               ) : inquiries.length === 0 ? (
                 <div className="p-12 text-center bg-slate-900 border border-slate-800 rounded-3xl">
@@ -1089,7 +1089,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Studio Profile & Database Management</h1>
                 <p className="text-xs text-slate-400 mt-1">
-                  Manage your Neon PostgreSQL connection, safe migrations, brand identity, and direct communication channels.
+                  Manage your Firebase Cloud Firestore collections, brand identity, and direct communication channels.
                 </p>
               </div>
 

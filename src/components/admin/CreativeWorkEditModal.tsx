@@ -172,7 +172,7 @@ export const CreativeWorkEditModal: React.FC<CreativeWorkEditModalProps> = ({
               {isEditing ? `Edit Creative Work: ${item?.title}` : 'Add New Creative & AI Asset'}
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Syncs to public gallery and Neon PostgreSQL database
+              Syncs to public gallery and Cloud Firestore database
             </p>
           </div>
           <button
