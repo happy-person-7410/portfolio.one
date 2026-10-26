@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase App singleton
@@ -11,6 +12,22 @@ export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+
+// Optional Google Analytics 4 (active if measurementId is provided)
+export let analytics: Analytics | null = null;
+const measurementId = firebaseConfig.measurementId || (typeof import.meta !== 'undefined' ? import.meta.env?.VITE_FIREBASE_MEASUREMENT_ID : '');
+
+if (typeof window !== 'undefined' && measurementId) {
+  isSupported()
+    .then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+      }
+    })
+    .catch(() => {
+      // Gracefully ignore if blocked by ad-blocker or unsupported environment
+    });
+}
 
 export const GENERATED_ADMIN_EMAIL = 'admin@happyperson.studio';
 export const GENERATED_ADMIN_PASSWORD = 'HpStudio!2026#SecureAdmin9';
