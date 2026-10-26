@@ -129,7 +129,7 @@ export const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
               {/* Get Started Button */}
               <button
                 type="button"
-                onClick={() => onSelectPlan(plan.name, plan.serviceCategory)}
+                onClick={() => onSelectPlan(plan.name, plan.serviceCategory || '')}
                 className={`w-full py-3.5 px-5 rounded-xl text-xs font-bold tracking-wide transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99] hover-lift focus-visible:ring-2 focus-visible:ring-blue-500 ${
                   plan.isRecommended
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'

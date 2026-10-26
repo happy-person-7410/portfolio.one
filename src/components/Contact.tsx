@@ -130,7 +130,7 @@ export const Contact: React.FC<ContactProps> = ({ initialService, initialBudget 
 
     let savedSuccessfully = false;
 
-    // 1. Save submitted inquiry to the contact_requests table in Neon PostgreSQL
+    // 1. Save submitted inquiry to the contactRequests collection in Firestore
     try {
       await submitContactRequest({
         name: formData.name.trim(),
@@ -672,7 +672,7 @@ export const Contact: React.FC<ContactProps> = ({ initialService, initialBudget 
                   </Button>
 
                   <p className="text-[11px] text-neutral-400 dark:text-neutral-500 text-center">
-                    Direct Messenger delivery with instant request archiving in Neon PostgreSQL.
+                    Direct Messenger delivery with instant request archiving in Cloud Firestore.
                   </p>
 
                 </form>

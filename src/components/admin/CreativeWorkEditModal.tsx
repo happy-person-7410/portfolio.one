@@ -42,7 +42,7 @@ export const CreativeWorkEditModal: React.FC<CreativeWorkEditModalProps> = ({
 
   const [id] = useState(item?.id || `creative-${Date.now().toString(36)}`);
   const [title, setTitle] = useState(item?.title || '');
-  const [category, setCategory] = useState<CreativeCategory>(item?.category || 'Logos & Branding');
+  const [category, setCategory] = useState<CreativeCategory>((item?.category as CreativeCategory) || 'Logos & Branding');
   const [shortDescription, setShortDescription] = useState(item?.shortDescription || '');
   const [thumbnail, setThumbnail] = useState(item?.thumbnail || '');
   const [fullImage, setFullImage] = useState(item?.fullImage || '');

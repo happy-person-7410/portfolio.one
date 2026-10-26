@@ -70,7 +70,7 @@ export const Services: React.FC<ServicesProps> = ({ onRequestService }) => {
           /* 8 Services Grid: 4 columns on large desktop, 2 on tablet, 1 on mobile */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service: Service) => {
-            const Icon = getIcon(service.iconName);
+            const Icon = getIcon(service.iconName || service.icon || 'Code');
             const isAiService = service.id === 'ai-image-video';
 
             return (
@@ -113,7 +113,7 @@ export const Services: React.FC<ServicesProps> = ({ onRequestService }) => {
                       Example Deliverables:
                     </span>
                     <ul className="space-y-2">
-                      {service.highlights.map((highlight, idx) => (
+                      {(service.highlights || []).map((highlight, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-xs text-neutral-700 dark:text-neutral-300">
                           <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                           <span>{highlight}</span>

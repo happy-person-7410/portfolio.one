@@ -71,7 +71,7 @@ export const MultiImageUploader: React.FC<MultiImageUploaderProps> = ({
       if (uploadedUrls.length > 0) {
         const combined = [...screenshots, ...uploadedUrls];
         onChange(combined);
-        setSuccessMsg(`Uploaded ${uploadedUrls.length} screenshot${uploadedUrls.length > 1 ? 's' : ''} to storage.`);
+        setSuccessMsg(`Uploaded ${uploadedUrls.length} screenshot${uploadedUrls.length > 1 ? 's' : ''} to Firebase Storage.`);
         setTimeout(() => setSuccessMsg(null), 3500);
       }
     } catch (err: unknown) {
@@ -143,15 +143,15 @@ export const MultiImageUploader: React.FC<MultiImageUploaderProps> = ({
             disabled={uploading}
             onClick={() => fileInputRef.current?.click()}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs transition cursor-pointer disabled:opacity-50"
-            title="Option A: Select image files from your computer"
+            title="Option A: Select image files to upload to Firebase Storage"
           >
             <UploadCloud className="w-4 h-4" />
-            <span>Upload to repository</span>
+            <span>Upload to Firebase Storage</span>
           </button>
           <button
             type="button"
             onClick={() => setShowUrlInput(!showUrlInput)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-medium border border-slate-700 transition cursor-pointer"
             title="Option B: Paste a public image URL"
           >
             <span>{showUrlInput ? 'Close URL' : '+ Paste URL'}</span>
@@ -198,7 +198,7 @@ export const MultiImageUploader: React.FC<MultiImageUploaderProps> = ({
           <RefreshCw className="w-4 h-4 text-blue-400 animate-spin shrink-0" />
           <div className="flex-1">
             <div className="flex items-center justify-between text-xs text-slate-300 mb-1">
-              <span>Optimizing and saving to repository (/public/images/)...</span>
+              <span>Uploading to Firebase Cloud Storage...</span>
               <span className="font-mono">{uploadProgress}%</span>
             </div>
             <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">

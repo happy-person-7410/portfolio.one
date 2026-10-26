@@ -18,8 +18,8 @@ export const ServiceEditModal: React.FC<ServiceEditModalProps> = ({
 }) => {
   const [title, setTitle] = useState(service.title);
   const [description, setDescription] = useState(service.description);
-  const [iconName, setIconName] = useState(service.iconName);
-  const [highlightsInput, setHighlightsInput] = useState(service.highlights.join('\n'));
+  const [iconName, setIconName] = useState(service.iconName || service.icon || 'Code');
+  const [highlightsInput, setHighlightsInput] = useState((service.highlights || service.features || []).join('\n'));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

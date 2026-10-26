@@ -26,7 +26,9 @@ import {
   Moon,
   Inbox,
   CheckCheck,
-  Image as ImageIcon
+  Image as ImageIcon,
+  UploadCloud,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePortfolioData } from '../../context/PortfolioDataContext';
@@ -43,7 +45,6 @@ import {
   fetchContactRequests,
   updateContactRequestStatus,
   deleteContactRequest,
-  initDatabaseOnServer,
   StoredContactRequest,
   saveCreativeWork,
   deleteCreativeWork,
@@ -219,35 +220,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
   }, [activeTab]);
 
   const handleUpdateInquiryStatus = async (id: string, status: string) => {
-    const ok = await updateContactRequestStatus(id, status);
-    if (ok) {
+    try {
+      await updateContactRequestStatus(id, status);
       setInquiries((prev) => prev.map((inq) => (inq.id === id ? { ...inq, status } : inq)));
       showToast(`Inquiry marked as ${status}`);
+    } catch {
+      showToast('Failed to update inquiry status');
     }
   };
 
   const handleDeleteInquiry = async (id: string) => {
     if (window.confirm('Delete this inquiry?')) {
-      const ok = await deleteContactRequest(id);
-      if (ok) {
+      try {
+        await deleteContactRequest(id);
         setInquiries((prev) => prev.filter((inq) => inq.id !== id));
         showToast('Inquiry deleted');
+      } catch {
+        showToast('Failed to delete inquiry');
       }
-    }
-  };
-
-  const handleSyncDatabase = async () => {
-    setSyncingDb(true);
-    try {
-      const res = await initDatabaseOnServer();
-      showToast('Neon database migrated and verified successfully!');
-      if (res.log && res.log.length > 0) {
-        console.log('Migration log:', res.log);
-      }
-    } catch (err: unknown) {
-      alert('Database sync notice: ' + ((err as Error).message || String(err)));
-    } finally {
-      setSyncingDb(false);
     }
   };
 
@@ -264,10 +254,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-bold text-sm tracking-tight text-slate-100">Happy Person Studio CMS</span>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live DB
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Firebase Firestore
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Free Assets (/public/images/)
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" /> Firebase Storage
               </span>
             </div>
             <p className="text-[11px] text-slate-400 font-mono">Owner: {user?.email || ownerEmail}</p>
@@ -783,7 +773,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                       
                       <div className="space-y-1.5">
                         <span className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Deliverables:</span>
-                        {s.highlights.map((h, i) => (
+                        {(s.highlights || s.features || []).map((h, i) => (
                           <div key={i} className="text-xs text-slate-400 flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                             <span>{h}</span>
@@ -1015,8 +1005,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                       <div className="space-y-2 flex-1">
                         <div className="flex items-center gap-2.5">
                           <span className="text-sm font-bold text-slate-100">{req.name}</span>
-                          {req.business_name && (
-                            <span className="text-xs text-slate-400">· {req.business_name}</span>
+                          {(req.businessName || req.business_name) && (
+                            <span className="text-xs text-slate-400">· {req.businessName || req.business_name}</span>
                           )}
                           <span
                             className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
@@ -1030,35 +1020,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-slate-400">
-                          {req.service_needed && (
+                          {(req.serviceNeeded || req.service_needed) && (
                             <div>
                               <span className="text-slate-500 block text-[10px]">Service</span>
-                              <span className="text-slate-200">{req.service_needed}</span>
+                              <span className="text-slate-200">{req.serviceNeeded || req.service_needed}</span>
                             </div>
                           )}
-                          {req.budget_range && (
+                          {(req.budgetRange || req.budget_range) && (
                             <div>
                               <span className="text-slate-500 block text-[10px]">Budget</span>
-                              <span className="text-emerald-400 font-medium">{req.budget_range}</span>
+                              <span className="text-emerald-400 font-medium">{req.budgetRange || req.budget_range}</span>
                             </div>
                           )}
-                          {req.preferred_contact && (
+                          {(req.preferredContact || req.preferred_contact) && (
                             <div>
                               <span className="text-slate-500 block text-[10px]">Preferred Channel</span>
-                              <span className="text-blue-400 font-medium">{req.preferred_contact}</span>
+                              <span className="text-blue-400 font-medium">{req.preferredContact || req.preferred_contact}</span>
                             </div>
                           )}
                         </div>
 
-                        {req.project_details && (
+                        {(req.projectDetails || req.project_details) && (
                           <div className="p-3 bg-slate-950/60 rounded-xl text-xs text-slate-300 border border-slate-800/80 mt-2">
                             <span className="text-[10px] text-slate-500 uppercase font-semibold block mb-1">Project Details</span>
-                            <p className="whitespace-pre-line leading-relaxed">{req.project_details}</p>
+                            <p className="whitespace-pre-line leading-relaxed">{req.projectDetails || req.project_details}</p>
                           </div>
                         )}
 
                         <div className="text-[10px] text-slate-500">
-                          Submitted: {new Date(req.created_at).toLocaleString()}
+                          Submitted: {new Date(req.createdAt || req.created_at || Date.now()).toLocaleString()}
                         </div>
                       </div>
 
@@ -1103,34 +1093,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                 </p>
               </div>
 
-              {/* Neon Database Management Card */}
+              {/* Firebase Cloud Backend Management Card */}
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                       <Database className="w-5 h-5" />
                     </div>
                     <div>
-                      <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                        Neon PostgreSQL Database Connection
-                      </h2>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-sm font-bold text-slate-100">
+                          Firebase Cloud Firestore & Storage
+                        </h2>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          ✓ Live & Connected
+                        </span>
+                      </div>
                       <p className="text-xs text-slate-400">
-                        Integrated via Cloudflare Pages Functions and @neondatabase/serverless driver.
+                        Project ID: <code className="text-slate-300 font-mono">gen-lang-client-0912034487</code> • DB: <code className="text-slate-300 font-mono">ai-studio-portfolioone-5c70045b-8d83-4c68-9274-58a523ba3ca6</code>
                       </p>
                     </div>
                   </div>
                   <button
-                    onClick={handleSyncDatabase}
-                    disabled={syncingDb}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md transition cursor-pointer disabled:opacity-50 shrink-0"
+                    onClick={handleReSeed}
+                    disabled={reSeeding}
+                    className="px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md transition cursor-pointer disabled:opacity-50 shrink-0"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${syncingDb ? 'animate-spin' : ''}`} />
-                    {syncingDb ? 'Verifying Schema...' : 'Run Safe Migrations & Sync'}
+                    <RefreshCw className={`w-3.5 h-3.5 ${reSeeding ? 'animate-spin' : ''}`} />
+                    {reSeeding ? 'Resetting Collections...' : 'Re-seed Firestore Default Data'}
                   </button>
                 </div>
-                <div className="text-[11px] text-slate-400 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 leading-relaxed">
-                  <span className="text-emerald-400 font-semibold">✓ Safe & Idempotent: </span>
-                  Running migrations never drops or resets your existing database data. It checks each table (<code>projects</code>, <code>site_settings</code>, <code>creative_works</code>, <code>services</code>, <code>pricing_plans</code>, <code>testimonials</code>, <code>contact_requests</code>, <code>admin_users</code>) using <code>CREATE TABLE IF NOT EXISTS</code>.
+                <div className="text-[11px] text-slate-400 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 leading-relaxed grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div>
+                    <span className="text-slate-300 font-semibold block">Authentication:</span>
+                    <span className="text-slate-400">Firebase Email/Password (Admin Only)</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-300 font-semibold block">Cloud Firestore:</span>
+                    <span className="text-slate-400">11 Secured Collections</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-300 font-semibold block">Firebase Storage:</span>
+                    <span className="text-slate-400">Global CDN /images/*</span>
+                  </div>
                 </div>
               </div>
 
@@ -1198,7 +1203,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                     onChange={(url) => setProfileForm({ ...profileForm, avatar: url })}
                     folder="brand"
                     label="Brand Mascot Avatar Image"
-                    description="Upload directly from computer to repository /public/images/brand/. Square avatar."
+                    description="Square avatar for brand identity. Hosted on Cloudinary Free CDN."
                     aspectRatio="square"
                     recommendedDimensions="400 × 400px"
                     presetChoices={[
@@ -1300,6 +1305,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                       onChange={(e) => setProfileForm({ ...profileForm, availability: e.target.value })}
                       className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
+                      <span>Available for New Projects</span>
+                      <span className={`text-[10px] font-bold uppercase ${profileForm.isAvailableForProjects !== false ? 'text-emerald-400' : 'text-slate-400'}`}>
+                        {profileForm.isAvailableForProjects !== false ? 'Badge ON' : 'Badge OFF'}
+                      </span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setProfileForm({ ...profileForm, isAvailableForProjects: !(profileForm.isAvailableForProjects !== false) })}
+                      className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border transition cursor-pointer ${
+                        profileForm.isAvailableForProjects !== false
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                          : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-750'
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${profileForm.isAvailableForProjects !== false ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
+                      <span>{profileForm.isAvailableForProjects !== false ? 'Available (Badge ON)' : 'Unavailable (Badge OFF)'}</span>
+                    </button>
                   </div>
                 </div>
 

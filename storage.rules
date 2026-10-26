@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'admin@happyperson.studio' ||
+        request.auth.token.email == 'happyperson7410@gmail.com'
+      );
+    }
+
+    // Public website visitors can read any portfolio images
+    match /images/{allPaths=**} {
+      allow read: if true;
+      allow write, delete: if isAdmin();
+    }
+
+    // Default match
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

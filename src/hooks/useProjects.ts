@@ -59,7 +59,7 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
           p.title.toLowerCase().includes(query) ||
           p.description.toLowerCase().includes(query) ||
           p.tags.some((t: string) => t.toLowerCase().includes(query)) ||
-          p.client.toLowerCase().includes(query)
+          (p.client || '').toLowerCase().includes(query)
       );
     }
 
@@ -71,7 +71,7 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
     setFetchError(null);
     try {
       await refreshData();
-      // Also perform direct /api/projects call to guarantee freshness
+      // Also perform direct Firestore fetch to guarantee freshness
       await fetchProjects();
     } catch (err: unknown) {
       setFetchError((err as Error).message || 'Failed to refresh projects.');

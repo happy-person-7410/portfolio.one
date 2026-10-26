@@ -7,9 +7,10 @@ import { CONTACT_CONFIG } from '../data/contactConfig';
 interface HeroProps {
   onViewWorkClick: () => void;
   onHireMeClick: () => void;
+  onWatchVisualsClick?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onViewWorkClick, onHireMeClick }) => {
+export const Hero: React.FC<HeroProps> = ({ onViewWorkClick, onHireMeClick, onWatchVisualsClick }) => {
   const { profile, messengerUrl, whatsappUrl, facebookPageUrl, email } = useSiteProfile();
   const messengerLink = messengerUrl || CONTACT_CONFIG.messengerUrl;
   const whatsappLink = whatsappUrl || CONTACT_CONFIG.whatsAppUrl;
@@ -100,6 +101,18 @@ export const Hero: React.FC<HeroProps> = ({ onViewWorkClick, onHireMeClick }) =>
               >
                 Start a Project
               </Button>
+
+              {onWatchVisualsClick && (
+                <button
+                  type="button"
+                  onClick={onWatchVisualsClick}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-indigo-500/10 hover:from-blue-500/20 hover:to-cyan-500/20 text-blue-700 dark:text-cyan-300 border border-blue-300/80 dark:border-cyan-500/30 shadow-2xs hover:shadow-sm transition-all cursor-pointer w-full sm:w-auto group active:scale-95"
+                  title="Watch the Music in Environment Visuals"
+                >
+                  <Sparkles className="w-4 h-4 text-blue-600 dark:text-cyan-400 group-hover:rotate-12 transition-transform" />
+                  <span>Watch Music & Visuals</span>
+                </button>
+              )}
             </div>
 
             {/* Secondary Direct Channels */}

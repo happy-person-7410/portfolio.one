@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Security Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'admin@happyperson.studio' ||
+        request.auth.token.email == 'happyperson7410@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Public Showcase Collections: Public read for published, Admin-only write
+    match /siteSettings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /projects/{projectId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /projectImages/{imageId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /projectFeatures/{featureId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /creativeWorks/{workId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /pricingPlans/{planId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /addOns/{addOnId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /faqs/{faqId} {
+      allow read: if resource == null || resource.data.isPublished != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Contact Requests: Public can create with validation, Admin-only read/manage
+    match /contactRequests/{requestId} {
+      allow create: if request.resource.data.name is string &&
+                       request.resource.data.name.size() > 0 &&
+                       request.resource.data.name.size() <= 200 &&
+                       request.resource.data.message is string &&
+                       request.resource.data.message.size() > 0 &&
+                       request.resource.data.message.size() <= 5000;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+  }
+}

@@ -3,16 +3,27 @@ export type CreativeCategory = 'Logos & Branding' | 'Banners & Social Media' | '
 export interface CreativeItem {
   id: string;
   title: string;
-  category: CreativeCategory;
-  shortDescription: string;
+  category: CreativeCategory | string;
+  shortDescription?: string;
+  description?: string;
   thumbnail: string;
+  thumbnailUrl?: string;
   fullImage?: string;
   youtubeId?: string;
   youtubeUrl?: string;
   videoUrl?: string;
-  toolsUsed: string[];
+  videoEmbedUrl?: string;
+  liveDemoUrl?: string;
+  mediaType?: string;
+  tags?: string[];
+  toolsUsed?: string[];
   deliverables?: string[];
+  featured?: boolean;
   order?: number;
+  displayOrder?: number;
+  isPublished?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const CREATIVE_ITEMS: CreativeItem[] = [
@@ -151,6 +162,20 @@ export const CREATIVE_ITEMS: CreativeItem[] = [
   // -------------------------------------------------------------
   // TAB 4: AI Videos (Embedded YouTube Responsive Player + Watch on YouTube)
   // -------------------------------------------------------------
+  {
+    id: "ai-vid-music-environment-visuals",
+    title: "Watch the Music: Environment Visuals",
+    category: "AI Videos",
+    shortDescription: "Immersive audiovisual project combining generative twilight landscape art, bioluminescent soundwaves, and reactive spatial ambient synthesizers.",
+    thumbnail: "/images/creative/music-environment-visuals.jpg",
+    fullImage: "/images/creative/music-environment-visuals.jpg",
+    youtubeId: "5qap5aO4i9A",
+    youtubeUrl: "https://www.youtube.com/watch?v=5qap5aO4i9A",
+    toolsUsed: ["Web Audio API", "Runway Gen-2", "Reactive Canvas", "Sound Design"],
+    deliverables: ["Real-time audio reactive 60fps canvas", "Ambient synthesizer soundscapes", "Bioluminescent particle dynamics", "Interactive environment lighting"],
+    featured: true,
+    order: 1
+  },
   {
     id: "ai-vid-product-commercial",
     title: "Futuristic Brand & Product Reel (AI Motion)",

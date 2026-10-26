@@ -20,13 +20,14 @@ import { FAQ } from './components/FAQ';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { FloatingContactButton } from './components/FloatingContactButton';
+import { EnvironmentVisualizer } from './components/EnvironmentVisualizer';
 import { AdminRoute } from './components/admin/AdminRoute';
-import { AdminSetup } from './components/admin/AdminSetup';
 import { useTheme } from './context/ThemeContext';
 
 export default function App() {
   const { theme } = useTheme();
   const [activeSection, setActiveSection] = useState<string>('home');
+  const [isVisualizerOpen, setIsVisualizerOpen] = useState<boolean>(false);
 
   // Owner Admin Route detection (/admin or #admin)
   const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => {
@@ -36,23 +37,13 @@ export default function App() {
     return path === '/admin' || path.startsWith('/admin/') || hash === '#admin' || hash === '#/admin' || hash.startsWith('#/admin/') || hash.startsWith('#admin/');
   });
 
-  // Dedicated One-Time Setup Route (/admin/setup)
-  const [isSetupRoute, setIsSetupRoute] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    const path = window.location.pathname;
-    const hash = window.location.hash;
-    return path === '/admin/setup' || path.startsWith('/admin/setup') || hash === '#/admin/setup' || hash === '#admin/setup';
-  });
-
   // Listen to popstate and hashchange for in-page navigation
   useEffect(() => {
     const handleRouteChange = () => {
       const path = window.location.pathname;
       const hash = window.location.hash;
       const admin = path === '/admin' || path.startsWith('/admin/') || hash === '#admin' || hash === '#/admin' || hash.startsWith('#/admin/') || hash.startsWith('#admin/');
-      const setup = path === '/admin/setup' || path.startsWith('/admin/setup') || hash === '#/admin/setup' || hash === '#admin/setup';
       setIsAdminRoute(admin);
-      setIsSetupRoute(setup);
     };
 
     window.addEventListener('popstate', handleRouteChange);
@@ -158,28 +149,11 @@ export default function App() {
 
   // If viewing the private owner admin route
   if (isAdminRoute) {
-    if (isSetupRoute) {
-      return (
-        <AdminSetup
-          onBackToSite={() => {
-            window.history.pushState({}, '', '/');
-            setIsAdminRoute(false);
-            setIsSetupRoute(false);
-          }}
-          onGoToLogin={() => {
-            window.history.pushState({}, '', '/admin');
-            setIsSetupRoute(false);
-          }}
-        />
-      );
-    }
-
     return (
       <AdminRoute
         onBackToSite={() => {
           window.history.pushState({}, '', '/');
           setIsAdminRoute(false);
-          setIsSetupRoute(false);
         }}
       />
     );
@@ -192,6 +166,7 @@ export default function App() {
       {/* 1. Sticky Responsive Navbar with theme toggle */}
       <Navbar
         onHireMeClick={() => scrollToContact()}
+        onOpenVisualizer={() => setIsVisualizerOpen(true)}
         activeSection={activeSection}
       />
 
@@ -200,6 +175,7 @@ export default function App() {
         <Hero
           onViewWorkClick={scrollToProjects}
           onHireMeClick={() => scrollToContact()}
+          onWatchVisualsClick={() => setIsVisualizerOpen(true)}
         />
 
         {/* 2. About Happy Person */}
@@ -209,7 +185,9 @@ export default function App() {
         <Projects />
 
         {/* 4. Creative & AI Work (Logos, Banners, AI Images, AI Videos) */}
-        <CreativeWork />
+        <CreativeWork 
+          onWatchMusicVisuals={() => setIsVisualizerOpen(true)}
+        />
 
         {/* 5. Before / After Redesigns */}
         <BeforeAfter />
@@ -264,6 +242,12 @@ export default function App() {
 
       {/* 13. Floating Contact Button (Messenger as primary) */}
       <FloatingContactButton />
+
+      {/* 14. Interactive Music in Environment Visuals Ambient Engine & Fullscreen Experience */}
+      <EnvironmentVisualizer 
+        isOpenExternally={isVisualizerOpen} 
+        onCloseExternal={() => setIsVisualizerOpen(false)} 
+      />
 
     </div>
   );

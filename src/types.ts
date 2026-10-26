@@ -9,46 +9,76 @@ export type ProjectCategory =
 
 export interface Project {
   id: string;
+  slug?: string;
   title: string;
   category: Exclude<ProjectCategory, 'All'>;
   description: string;
   tags: string[];
   thumbnail: string;
+  thumbnail_url?: string;
   previewVideoUrl?: string;
   liveDemoUrl: string;
-  problem: string;
-  solution: string;
-  features: string[];
-  screenshots: string[];
-  client: string;
-  duration: string;
+  githubUrl?: string;
+  problem?: string;
+  solution?: string;
+  features?: string[];
+  screenshots?: string[];
+  client?: string;
+  role?: string;
+  year?: string;
+  completionDate?: string;
+  duration?: string;
+  techStack?: string[];
   impactMetrics?: { label: string; value: string }[];
   featured?: boolean;
   hidden?: boolean;
   order?: number;
+  displayOrder?: number;
+  isPublished?: boolean;
+  createdAt?: string;
   updatedAt?: string;
 }
 
 export interface Service {
   id: string;
   title: string;
+  category?: string;
   description: string;
-  iconName: string;
-  highlights: string[];
+  shortDescription?: string;
+  fullDescription?: string;
+  icon?: string;
+  iconName?: string;
+  features?: string[];
+  deliverables?: string[];
+  startingPrice?: string;
+  turnaround?: string;
+  highlights?: string[];
   order?: number;
+  displayOrder?: number;
+  isPublished?: boolean;
+  createdAt?: string;
   updatedAt?: string;
 }
 
 export interface Testimonial {
   id: string;
   name: string;
+  clientName?: string;
   role: string;
-  businessType: string;
+  clientRole?: string;
+  clientCompany?: string;
+  clientAvatar?: string;
+  businessType?: string;
   rating: number;
   quote: string;
-  avatar: string;
-  location: string;
+  projectTitle?: string;
+  avatar?: string;
+  location?: string;
+  verified?: boolean;
   order?: number;
+  displayOrder?: number;
+  isPublished?: boolean;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -56,12 +86,23 @@ export interface PricingPlan {
   id: string;
   name: string;
   price: string;
-  subtitle: string;
+  subtitle?: string;
+  tag?: string;
+  period?: string;
+  description?: string;
+  popular?: boolean;
+  badge?: string;
   features: string[];
-  isRecommended: boolean;
-  serviceCategory: string;
-  turnaroundTime: string;
+  notIncluded?: string[];
+  ctaText?: string;
+  ctaLink?: string;
+  isRecommended?: boolean;
+  serviceCategory?: string;
+  turnaroundTime?: string;
   order?: number;
+  displayOrder?: number;
+  isPublished?: boolean;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -71,6 +112,8 @@ export interface AddonService {
   price: string;
   unit?: string;
   description?: string;
+  displayOrder?: number;
+  isPublished?: boolean;
 }
 
 export interface FaqItem {
@@ -78,6 +121,8 @@ export interface FaqItem {
   question: string;
   answer: string;
   order?: number;
+  displayOrder?: number;
+  isPublished?: boolean;
   updatedAt?: string;
 }
 
@@ -107,6 +152,7 @@ export interface SiteProfile {
   whatsapp: string;
   location: string;
   availability: string;
+  isAvailableForProjects?: boolean;
   socials: {
     facebook: string;
     whatsapp: string;

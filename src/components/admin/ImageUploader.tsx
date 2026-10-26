@@ -35,9 +35,9 @@ interface ImageUploaderProps {
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
   value,
   onChange,
-  folder,
+  folder = 'projects',
   label = 'Portfolio Image Asset',
-  description = 'Stored directly in repository /public/images/ folder. 100% Free, no paid hosting.',
+  description = 'Stored securely in Firebase Cloud Storage. Public image URL stored in Firestore.',
   aspectRatio = 'wide',
   recommendedDimensions = '1200 × 750px',
   allowDelete = true,
@@ -80,10 +80,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       });
 
       onChange(result.url);
-      setStatusMessage(`Saved to ${result.url} (${(result.size / 1024).toFixed(0)} KB)`);
+      setStatusMessage(`Uploaded to Firebase Storage: ${result.url} (${(result.size / 1024).toFixed(0)} KB)`);
       setTimeout(() => setStatusMessage(null), 4000);
     } catch (err: unknown) {
-      setErrorMessage((err as Error).message || 'Failed to save image to public assets.');
+      setErrorMessage((err as Error).message || 'Failed to upload image to Firebase Storage.');
     } finally {
       setUploading(false);
       setProgress(0);
@@ -177,7 +177,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             {uploading && (
               <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xs flex flex-col items-center justify-center p-4">
                 <RefreshCw className="w-6 h-6 text-blue-400 animate-spin mb-2" />
-                <span className="text-xs font-semibold text-white">Saving to /public/images/...</span>
+                <span className="text-xs font-semibold text-white">Uploading to Firebase Storage...</span>
                 <div className="w-48 h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden">
                   <div
                     className="h-full bg-blue-500 transition-all duration-200"
@@ -245,8 +245,8 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
               }`}
             >
-              <HardDrive className="w-3.5 h-3.5" />
-              <span>Option A: Upload image to repository</span>
+              <UploadCloud className="w-3.5 h-3.5" />
+              <span>Option A: Firebase Storage Upload</span>
             </button>
             <button
               type="button"
@@ -262,7 +262,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             </button>
           </div>
 
-          {/* Option A: Direct File Upload to Repository */}
+          {/* Option A: Direct File Upload to Firebase Storage */}
           {activeTab === 'upload' && (
             <div
               onDrop={handleDrop}
@@ -279,7 +279,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 <div className="flex flex-col items-center py-3">
                   <RefreshCw className="w-8 h-8 text-blue-400 animate-spin mb-3" />
                   <span className="text-xs font-semibold text-slate-200">
-                    Optimizing to WebP & saving to repository...
+                    Uploading directly to Firebase Storage...
                   </span>
                   <div className="w-48 h-1.5 bg-slate-800 rounded-full mt-3 overflow-hidden">
                     <div
@@ -294,10 +294,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                     <UploadCloud className="w-6 h-6" />
                   </div>
                   <p className="text-xs font-semibold text-slate-200">
-                    Upload image to repository (/public/images/{folder}/)
+                    Upload image to Firebase Cloud Storage
                   </p>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Click to select from computer or drag & drop. Auto-converted to optimized WebP.
+                    Click to select from computer or drag & drop. Public CDN URL saved to Firestore.
                   </p>
                 </div>
               )}

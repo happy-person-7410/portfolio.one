@@ -1,5 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getAuthToken, setAuthToken } from '../services/portfolioService';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser,
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db, GENERATED_ADMIN_EMAIL, GENERATED_ADMIN_PASSWORD } from '../lib/firebase';
 
 export interface UserSession {
   id?: string;
@@ -23,76 +31,50 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const OWNER_EMAIL = 'happyperson7410@gmail.com';
+export const OWNER_EMAIL = GENERATED_ADMIN_EMAIL;
 
 export function isOwner(email?: string | null): boolean {
   if (!email) return false;
-  const lower = email.toLowerCase();
   return (
-    lower === OWNER_EMAIL.toLowerCase() ||
-    lower === 'faysalhappy7410@gmail.com' ||
-    lower === 'danahobi20@gmail.com'
+    email.toLowerCase() === GENERATED_ADMIN_EMAIL.toLowerCase() ||
+    email.toLowerCase() === 'happyperson7410@gmail.com'
   );
 }
 
-const AUTH_USER_KEY = 'hp_admin_user_session';
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserSession | null>(null);
-  const [token, setTokenState] = useState<string | null>(getAuthToken());
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Validate existing session from backend on load
   useEffect(() => {
-    const initSession = async () => {
-      const storedToken = getAuthToken();
-      if (!storedToken) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const res = await fetch('/api/admin/me', {
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
+      if (fbUser && fbUser.email && isOwner(fbUser.email)) {
+        const idToken = await fbUser.getIdToken();
+        setUser({
+          id: fbUser.uid,
+          email: fbUser.email,
+          role: 'admin',
         });
-
-        if (res.ok) {
-          const data = await res.json() as { success: boolean; user: UserSession };
-          if (data.user) {
-            setUser(data.user);
-            setTokenState(storedToken);
-            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
-          }
-        } else {
-          // Token expired or invalid
-          setAuthToken(null);
-          setTokenState(null);
-          setUser(null);
-          localStorage.removeItem(AUTH_USER_KEY);
-        }
-      } catch (err) {
-        // If offline or network issue, fallback to cached user session
-        console.warn('Session verification fallback:', err);
-        try {
-          const cached = localStorage.getItem(AUTH_USER_KEY);
-          if (cached) {
-            setUser(JSON.parse(cached));
-          }
-        } catch {}
-      } finally {
-        setLoading(false);
+        setToken(idToken);
+      } else if (fbUser) {
+        // Disallow any non-admin accounts
+        await signOut(auth);
+        setUser(null);
+        setToken(null);
+      } else {
+        setUser(null);
+        setToken(null);
       }
-    };
+      setLoading(false);
+    });
 
-    initSession();
+    return () => unsubscribe();
   }, []);
 
   const loginWithGoogle = async () => {
-    setAuthError(null);
-    await handleLoginWithEmail('happyperson7410@gmail.com', 'Admin@HappyPerson2026');
+    // Single designated owner authentication via email/password
+    await handleLoginWithEmail(GENERATED_ADMIN_EMAIL, GENERATED_ADMIN_PASSWORD);
   };
 
   const handleLoginWithEmail = async (email: string, pass: string) => {
@@ -100,48 +82,86 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const trimmed = email.trim();
 
     if (!trimmed || !pass) {
-      throw new Error('Please enter both email and password.');
+      const err = 'Please enter both email and password.';
+      setAuthError(err);
+      throw new Error(err);
+    }
+
+    // Strict security check: only the generated owner account is permitted
+    if (trimmed.toLowerCase() !== GENERATED_ADMIN_EMAIL.toLowerCase()) {
+      const err = 'Invalid email or password.';
+      setAuthError(err);
+      throw new Error(err);
     }
 
     try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmed, password: pass }),
+      // 1. Try logging into Firebase Auth
+      const userCred = await signInWithEmailAndPassword(auth, GENERATED_ADMIN_EMAIL, pass);
+      const idToken = await userCred.user.getIdToken();
+      setUser({
+        id: userCred.user.uid,
+        email: userCred.user.email || GENERATED_ADMIN_EMAIL,
+        role: 'admin',
       });
+      setToken(idToken);
+    } catch (firebaseErr: any) {
+      // If user does not exist yet in the new Firebase project, bootstrap the generated owner account
+      if (
+        (firebaseErr.code === 'auth/user-not-found' ||
+          firebaseErr.code === 'auth/invalid-credential' ||
+          firebaseErr.code === 'auth/invalid-login-credentials') &&
+        pass === GENERATED_ADMIN_PASSWORD
+      ) {
+        try {
+          const newCred = await createUserWithEmailAndPassword(auth, GENERATED_ADMIN_EMAIL, GENERATED_ADMIN_PASSWORD);
+          // Register in admins collection
+          await setDoc(
+            doc(db, 'admins', newCred.user.uid),
+            {
+              email: GENERATED_ADMIN_EMAIL,
+              role: 'owner',
+              createdAt: new Date().toISOString(),
+            },
+            { merge: true }
+          );
 
-      const data = await res.json() as { success?: boolean; token?: string; user?: UserSession; error?: string };
-
-      if (!res.ok || !data.success || !data.token) {
-        throw new Error(data.error || 'Invalid email or password.');
+          const idToken = await newCred.user.getIdToken();
+          setUser({
+            id: newCred.user.uid,
+            email: newCred.user.email || GENERATED_ADMIN_EMAIL,
+            role: 'admin',
+          });
+          setToken(idToken);
+          return;
+        } catch (createErr: any) {
+          console.error('Admin bootstrap note:', createErr);
+        }
       }
 
-      // Store secure token
-      setAuthToken(data.token);
-      setTokenState(data.token);
-      setUser(data.user || { email: trimmed, role: 'admin' });
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user || { email: trimmed, role: 'admin' }));
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Login failed.';
-      setAuthError(msg);
-      throw err;
+      const err = 'Invalid email or password.';
+      setAuthError(err);
+      throw new Error(err);
     }
   };
 
-  const handleRegisterWithEmail = async (email: string, pass: string) => {
-    setAuthError(null);
-    await handleLoginWithEmail(email, pass);
+  const handleRegisterWithEmail = async () => {
+    const err = 'Registration is disabled. Only the designated administrator can access the CMS.';
+    setAuthError(err);
+    throw new Error(err);
   };
 
   const handleLogout = async () => {
-    setAuthToken(null);
-    setTokenState(null);
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.warn('Signout note:', err);
+    }
     setUser(null);
+    setToken(null);
     setAuthError(null);
-    localStorage.removeItem(AUTH_USER_KEY);
   };
 
-  const isOwnerAdmin = Boolean(user && (user.role === 'admin' || isOwner(user.email)));
+  const isOwnerAdmin = Boolean(user && isOwner(user.email));
 
   return (
     <AuthContext.Provider

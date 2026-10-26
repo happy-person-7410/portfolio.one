@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Menu, X, ArrowUpRight } from 'lucide-react';
+import { Sun, Moon, Menu, X, ArrowUpRight, Music2 } from 'lucide-react';
 import { usePortfolioData } from '../context/PortfolioDataContext';
 import { useTheme } from '../context/ThemeContext';
 
 interface NavbarProps {
   onHireMeClick: () => void;
+  onOpenVisualizer?: () => void;
   activeSection?: string;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
   onHireMeClick,
+  onOpenVisualizer,
   activeSection = 'home'
 }) => {
   const { profile } = usePortfolioData();
@@ -125,6 +127,20 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Zone 3: Actions (Theme Toggle + Hire Me CTA) */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            {/* Watch Music in Environment Visuals trigger button */}
+            {onOpenVisualizer && (
+              <button
+                type="button"
+                onClick={onOpenVisualizer}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                title="Watch the Music in Environment Visuals"
+                aria-label="Open Music & Visuals"
+              >
+                <Music2 className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 animate-pulse" />
+                <span className="hidden md:inline">Music & Visuals</span>
+              </button>
+            )}
+
             {/* Dark / Light Toggle Button */}
             <button
               onClick={toggleTheme}

@@ -7,7 +7,11 @@ import { MessengerIcon } from './icons/MessengerIcon';
 import { useCreativeWorks } from '../hooks';
 import { CreativeWorkSkeleton } from './skeletons';
 
-export const CreativeWork: React.FC = () => {
+interface CreativeWorkProps {
+  onWatchMusicVisuals?: () => void;
+}
+
+export const CreativeWork: React.FC<CreativeWorkProps> = ({ onWatchMusicVisuals }) => {
   const {
     filteredWorks: filteredItems,
     selectedTab,
@@ -138,7 +142,7 @@ export const CreativeWork: React.FC = () => {
                     
                     {/* Tool Badges */}
                     <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-                      {item.toolsUsed.map((tool) => (
+                      {(item.toolsUsed || []).map((tool) => (
                         <span
                           key={tool}
                           className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-neutral-200/80 dark:bg-[#171f33] text-neutral-700 dark:text-neutral-300 font-medium"
@@ -179,7 +183,28 @@ export const CreativeWork: React.FC = () => {
 
                 {/* Footer Action Area */}
                 <div className="p-6 pt-0">
-                  {isVideo ? (
+                  {item.id === 'ai-vid-music-environment-visuals' ? (
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onWatchMusicVisuals?.()}
+                        className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-md shadow-blue-500/25 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                        title="Watch the Music in Live Interactive Environment Visuals"
+                      >
+                        <Sparkles className="w-4 h-4 text-cyan-200 animate-spin-slow" />
+                        <span>Watch in Live Visuals</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewItem(item)}
+                        className="inline-flex items-center justify-center gap-1.5 w-full sm:w-auto py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-neutral-200/70 hover:bg-neutral-200 dark:bg-[#171f33] dark:hover:bg-[#1e293b] text-neutral-800 dark:text-neutral-200 transition-colors cursor-pointer"
+                        title="View Artwork Details"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-blue-500" />
+                        <span>Preview</span>
+                      </button>
+                    </div>
+                  ) : isVideo ? (
                     <div className="flex items-center gap-2">
                       {item.youtubeUrl || item.youtubeId ? (
                         <a
@@ -291,15 +316,30 @@ export const CreativeWork: React.FC = () => {
               <p className="text-xs text-neutral-600 dark:text-neutral-400 max-w-lg text-center sm:text-left">
                 {previewItem.shortDescription}
               </p>
-              <a
-                href={CONTACT_CONFIG.messengerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#0084FF] to-[#0062E0] hover:from-[#0074E8] hover:to-[#0052C8] shadow-md transition-all cursor-pointer whitespace-nowrap"
-              >
-                <MessengerIcon className="w-4 h-4 fill-white" />
-                <span>Request Similar Design</span>
-              </a>
+              <div className="flex items-center gap-2.5 shrink-0">
+                {previewItem.id === 'ai-vid-music-environment-visuals' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreviewItem(null);
+                      onWatchMusicVisuals?.();
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-md transition-all cursor-pointer whitespace-nowrap hover:scale-105 active:scale-95"
+                  >
+                    <Sparkles className="w-4 h-4 text-cyan-200" />
+                    <span>Launch Live Visualizer</span>
+                  </button>
+                )}
+                <a
+                  href={CONTACT_CONFIG.messengerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#0084FF] to-[#0062E0] hover:from-[#0074E8] hover:to-[#0052C8] shadow-md transition-all cursor-pointer whitespace-nowrap"
+                >
+                  <MessengerIcon className="w-4 h-4 fill-white" />
+                  <span>Request Similar Project</span>
+                </a>
+              </div>
             </div>
 
           </div>

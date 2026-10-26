@@ -1,0 +1,298 @@
+{
+  "entities": {
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Portfolio studio global settings, brand configuration, and profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "brandName": { "type": "string" },
+        "studioType": { "type": "string" },
+        "headline": { "type": "string" },
+        "subheading": { "type": "string" },
+        "bio": { "type": "string" },
+        "avatar": { "type": "string" },
+        "ogBanner": { "type": "string" },
+        "messengerUrl": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "availability": { "type": "string" },
+        "isAvailableForProjects": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["brandName"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Portfolio showcase case study project",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "client": { "type": "string" },
+        "role": { "type": "string" },
+        "year": { "type": "string" },
+        "completionDate": { "type": "string" },
+        "liveDemoUrl": { "type": "string" },
+        "githubUrl": { "type": "string" },
+        "thumbnail_url": { "type": "string" },
+        "techStack": { "type": "array" },
+        "tags": { "type": "array" },
+        "featured": { "type": "boolean" },
+        "hidden": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["slug", "title", "category"]
+    },
+    "ProjectImage": {
+      "title": "ProjectImage",
+      "description": "Gallery screenshot or detail photo for a project",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "altText": { "type": "string" },
+        "caption": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["projectId", "imageUrl"]
+    },
+    "ProjectFeature": {
+      "title": "ProjectFeature",
+      "description": "Highlight bullet or feature of a project",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["projectId", "title"]
+    },
+    "CreativeWork": {
+      "title": "CreativeWork",
+      "description": "Graphic, logo, banner, AI render, or motion work",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "thumbnailUrl": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "videoEmbedUrl": { "type": "string" },
+        "liveDemoUrl": { "type": "string" },
+        "tags": { "type": "array" },
+        "featured": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["title", "category", "thumbnailUrl"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Service package offered by the studio",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "fullDescription": { "type": "string" },
+        "icon": { "type": "string" },
+        "features": { "type": "array" },
+        "deliverables": { "type": "array" },
+        "startingPrice": { "type": "string" },
+        "turnaround": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["title", "category"]
+    },
+    "PricingPlan": {
+      "title": "PricingPlan",
+      "description": "Fixed or package pricing option",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "tag": { "type": "string" },
+        "price": { "type": "string" },
+        "period": { "type": "string" },
+        "description": { "type": "string" },
+        "popular": { "type": "boolean" },
+        "badge": { "type": "string" },
+        "features": { "type": "array" },
+        "notIncluded": { "type": "array" },
+        "ctaText": { "type": "string" },
+        "ctaLink": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "price"]
+    },
+    "AddOn": {
+      "title": "AddOn",
+      "description": "Add-on optional service module",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "string" },
+        "description": { "type": "string" },
+        "duration": { "type": "string" },
+        "category": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "price"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "Client quote, verification, and rating",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientRole": { "type": "string" },
+        "clientCompany": { "type": "string" },
+        "clientAvatar": { "type": "string" },
+        "quote": { "type": "string" },
+        "projectTitle": { "type": "string" },
+        "rating": { "type": "number" },
+        "verified": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["clientName", "quote"]
+    },
+    "FaqItem": {
+      "title": "FaqItem",
+      "description": "Frequently asked question & answer pair",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "question": { "type": "string" },
+        "answer": { "type": "string" },
+        "category": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["question", "answer"]
+    },
+    "ContactRequest": {
+      "title": "ContactRequest",
+      "description": "Client contact inquiry submission",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "company": { "type": "string" },
+        "projectType": { "type": "string" },
+        "budget": { "type": "string" },
+        "timeline": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "preferredContact": { "type": "string" },
+        "formattedMessage": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "message"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized administrator record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/siteSettings/{id}": {
+      "schema": "SiteSettings",
+      "description": "Global studio settings documents"
+    },
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Portfolio projects showcase documents"
+    },
+    "/projectImages/{imageId}": {
+      "schema": "ProjectImage",
+      "description": "Images and gallery screenshots for projects"
+    },
+    "/projectFeatures/{featureId}": {
+      "schema": "ProjectFeature",
+      "description": "Project feature bullets"
+    },
+    "/creativeWorks/{workId}": {
+      "schema": "CreativeWork",
+      "description": "Creative design and AI artwork items"
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Studio service offerings"
+    },
+    "/pricingPlans/{planId}": {
+      "schema": "PricingPlan",
+      "description": "Package pricing plans"
+    },
+    "/addOns/{addOnId}": {
+      "schema": "AddOn",
+      "description": "Optional add-on services"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "Testimonial",
+      "description": "Client reviews and testimonials"
+    },
+    "/faqs/{faqId}": {
+      "schema": "FaqItem",
+      "description": "FAQ questions and answers"
+    },
+    "/contactRequests/{requestId}": {
+      "schema": "ContactRequest",
+      "description": "Client inquiry submissions"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Registered admins and owners"
+    }
+  }
+}

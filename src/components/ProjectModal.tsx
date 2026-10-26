@@ -218,7 +218,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               }`}
             >
               <ImageIcon className="w-4 h-4" />
-              <span>Gallery ({project.screenshots.length})</span>
+              <span>Gallery ({(project.screenshots || []).length})</span>
             </button>
           </div>
 
@@ -234,7 +234,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                   High-Resolution Screenshots & Layout Previews
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {project.screenshots.map((s, idx) => (
+                  {(project.screenshots || []).map((s, idx) => (
                     <div key={idx} className="rounded-xl overflow-hidden border border-neutral-200 dark:border-[#1e293b] bg-neutral-950 aspect-video">
                       <img
                         src={s}
@@ -320,7 +320,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                     Key Features Built
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {project.features.map((feature, idx) => (
+                    {(project.features || []).map((feature, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-neutral-50/70 dark:bg-[#131b2e]/60 border border-neutral-200/70 dark:border-[#1e293b] text-xs text-neutral-700 dark:text-neutral-300">
                         <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                         <span>{feature}</span>
