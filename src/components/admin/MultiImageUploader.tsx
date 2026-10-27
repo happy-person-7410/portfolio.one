@@ -71,7 +71,7 @@ export const MultiImageUploader: React.FC<MultiImageUploaderProps> = ({
       if (uploadedUrls.length > 0) {
         const combined = [...screenshots, ...uploadedUrls];
         onChange(combined);
-        setSuccessMsg(`Uploaded ${uploadedUrls.length} screenshot${uploadedUrls.length > 1 ? 's' : ''} to Firebase Storage.`);
+        setSuccessMsg(`✓ Successfully added ${uploadedUrls.length} screenshot${uploadedUrls.length > 1 ? 's' : ''} (CORS-safe).`);
         setTimeout(() => setSuccessMsg(null), 3500);
       }
     } catch (err: unknown) {

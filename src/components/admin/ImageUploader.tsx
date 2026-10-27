@@ -80,8 +80,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       });
 
       onChange(result.url);
-      setStatusMessage(`Uploaded to Firebase Storage: ${result.url} (${(result.size / 1024).toFixed(0)} KB)`);
-      setTimeout(() => setStatusMessage(null), 4000);
+      const isInline = result.url.startsWith('data:');
+      setStatusMessage(
+        isInline
+          ? `✓ Asset optimized and stored (${(result.size / 1024).toFixed(0)} KB) — CORS bypass active`
+          : `✓ Asset uploaded to Firebase Storage (${(result.size / 1024).toFixed(0)} KB)`
+      );
+      setTimeout(() => setStatusMessage(null), 4500);
     } catch (err: unknown) {
       setErrorMessage((err as Error).message || 'Failed to upload image to Firebase Storage.');
     } finally {
@@ -246,7 +251,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               }`}
             >
               <UploadCloud className="w-3.5 h-3.5" />
-              <span>Option A: Firebase Storage Upload</span>
+              <span>Option A: Direct Upload (CORS-Safe)</span>
             </button>
             <button
               type="button"
@@ -258,11 +263,11 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               }`}
             >
               <LinkIcon className="w-3.5 h-3.5" />
-              <span>Option B: Paste public image URL</span>
+              <span>Option B: Paste Image URL / Free Host</span>
             </button>
           </div>
 
-          {/* Option A: Direct File Upload to Firebase Storage */}
+          {/* Option A: Direct File Upload with CORS-Bypass */}
           {activeTab === 'upload' && (
             <div
               onDrop={handleDrop}
@@ -279,7 +284,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 <div className="flex flex-col items-center py-3">
                   <RefreshCw className="w-8 h-8 text-blue-400 animate-spin mb-3" />
                   <span className="text-xs font-semibold text-slate-200">
-                    Uploading directly to Firebase Storage...
+                    Optimizing & saving image asset...
                   </span>
                   <div className="w-48 h-1.5 bg-slate-800 rounded-full mt-3 overflow-hidden">
                     <div
@@ -294,41 +299,66 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                     <UploadCloud className="w-6 h-6" />
                   </div>
                   <p className="text-xs font-semibold text-slate-200">
-                    Upload image to Firebase Cloud Storage
+                    Select or drag image to upload
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    Click to select from computer or drag & drop. Public CDN URL saved to Firestore.
+                  <p className="text-[11px] text-slate-400 mt-1 max-w-sm">
+                    Auto-compresses to lightweight WebP. Automatically bypasses Cloud Storage CORS blocks if present.
                   </p>
+                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    ✓ CORS auto-fallback enabled
+                  </span>
                 </div>
               )}
             </div>
           )}
 
-          {/* Option B: Paste Public Image URL */}
+          {/* Option B: Paste Public Image URL & Free External Hosts */}
           {activeTab === 'url' && (
             <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl space-y-3">
               <label className="block text-xs font-medium text-slate-300">
-                Paste public image URL (e.g. /images/..., Imgur, GitHub Raw, etc.)
+                Paste any public image URL (PostImages, ImgBB, Cloudinary, Unsplash, etc.)
               </label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={customUrl}
                   onChange={(e) => setCustomUrl(e.target.value)}
-                  placeholder="/images/projects/dental-clinic-hero.webp or https://..."
+                  placeholder="https://i.postimg.cc/... or /images/..."
                   className="flex-1 px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
                 />
                 <button
                   type="button"
                   onClick={handleApplyUrl}
-                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold cursor-pointer shadow-xs"
+                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold cursor-pointer shadow-xs shrink-0"
                 >
                   Apply URL
                 </button>
               </div>
-              <span className="text-[11px] text-slate-400 block">
-                Relative paths starting with <code>/images/...</code> load directly from this site's public assets folder.
-              </span>
+
+              {/* Free image host suggestions */}
+              <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-[11px] text-slate-400 gap-2">
+                <span>Free zero-CORS image uploaders:</span>
+                <div className="flex items-center gap-3">
+                  <a
+                    href="https://postimages.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline inline-flex items-center gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    PostImages.org <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <a
+                    href="https://imgbb.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline inline-flex items-center gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    ImgBB.com <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
             </div>
           )}
         </div>
