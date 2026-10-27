@@ -80,7 +80,7 @@ export const ProjectEditModal: React.FC<ProjectEditModalProps> = ({
       client: client.trim() || 'Client Showcase',
       duration: duration.trim() || '2 Weeks',
       thumbnail: thumbnail.trim(),
-      previewVideoUrl: previewVideoUrl.trim() || undefined,
+      previewVideoUrl: previewVideoUrl.trim() || '',
       liveDemoUrl: liveDemoUrl.trim(),
       problem: problem.trim() || 'Legacy interface lacked conversion and mobile responsiveness.',
       solution: solution.trim() || 'Designed and developed a fast, modern digital experience.',

@@ -1110,7 +1110,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToSite }) 
                         </span>
                       </div>
                       <p className="text-xs text-slate-400">
-                        Project ID: <code className="text-slate-300 font-mono">gen-lang-client-0912034487</code> • DB: <code className="text-slate-300 font-mono">ai-studio-portfolioone-5c70045b-8d83-4c68-9274-58a523ba3ca6</code>
+                        Project ID: <code className="text-slate-300 font-mono">portfolio-58191</code> • DB: <code className="text-slate-300 font-mono">(default)</code>
                       </p>
                     </div>
                   </div>

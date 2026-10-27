@@ -40,6 +40,72 @@ import { CREATIVE_ITEMS as DEFAULT_CREATIVE } from '../data/creativeData';
 import { ADDON_SERVICES as DEFAULT_ADDONS } from '../data/pricingData';
 import { compressImage, sanitizeFilename } from '../utils/imageCompressor';
 
+/**
+ * Recursively sanitizes any JavaScript object or array for Firestore.
+ * Converts `undefined` values to `null` (or empty strings where appropriate)
+ * so that Firestore's setDoc, updateDoc, or addDoc never throws:
+ * "Unsupported field value: undefined (found in field ...)"
+ */
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === undefined) {
+    return null as unknown as T;
+  }
+  if (data === null || typeof data !== 'object') {
+    return data;
+  }
+  if (data instanceof Date) {
+    return data.toISOString() as unknown as T;
+  }
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeForFirestore(item)) as unknown as T;
+  }
+  const cleanObj: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data as Record<string, any>)) {
+    if (value === undefined) {
+      cleanObj[key] = null;
+    } else if (typeof value === 'object' && value !== null) {
+      cleanObj[key] = sanitizeForFirestore(value);
+    } else {
+      cleanObj[key] = value;
+    }
+  }
+  return cleanObj as T;
+}
+
+/**
+ * Safe wrapper around setDoc that guarantees all undefined fields are converted to null or handled cleanly.
+ */
+export async function safeSetDoc(
+  docRef: any,
+  data: any,
+  options?: any
+): Promise<void> {
+  const sanitized = sanitizeForFirestore(data);
+  return options ? setDoc(docRef, sanitized, options) : setDoc(docRef, sanitized);
+}
+
+/**
+ * Safe wrapper around updateDoc that guarantees zero undefined values.
+ */
+export async function safeUpdateDoc(
+  docRef: any,
+  data: any
+): Promise<void> {
+  const sanitized = sanitizeForFirestore(data);
+  return updateDoc(docRef, sanitized);
+}
+
+/**
+ * Safe wrapper around addDoc that guarantees zero undefined values.
+ */
+export async function safeAddDoc(
+  colRef: any,
+  data: any
+): Promise<any> {
+  const sanitized = sanitizeForFirestore(data);
+  return addDoc(colRef, sanitized);
+}
+
 // Types for Contact Requests stored in Firestore
 export interface StoredContactRequest {
   id: string;
@@ -204,16 +270,23 @@ export async function fetchProjectBySlug(slug: string): Promise<Project | null> 
 export async function saveProject(project: Project): Promise<void> {
   const id = project.id || project.slug || `project-${Date.now()}`;
   try {
-    await setDoc(
+    const payload = {
+      ...project,
+      id,
+      previewVideoUrl: project.previewVideoUrl ?? '',
+      liveDemoUrl: project.liveDemoUrl ?? '',
+      githubUrl: project.githubUrl ?? '',
+      client: project.client ?? '',
+      badge: (project as any).badge ?? '',
+      displayOrder: project.order ?? project.displayOrder ?? 0,
+      isPublished: !project.hidden,
+      updatedAt: new Date().toISOString(),
+      createdAt: project.createdAt || new Date().toISOString(),
+    };
+
+    await safeSetDoc(
       doc(db, 'projects', id),
-      {
-        ...project,
-        id,
-        displayOrder: project.order ?? project.displayOrder ?? 0,
-        isPublished: !project.hidden,
-        updatedAt: new Date().toISOString(),
-        createdAt: project.createdAt || new Date().toISOString(),
-      },
+      payload,
       { merge: true }
     );
   } catch (err) {
@@ -326,16 +399,22 @@ export function subscribeToCreativeWorks(
 export async function saveCreativeWork(item: CreativeItem): Promise<void> {
   const id = item.id || `creative-${Date.now()}`;
   try {
-    await setDoc(
+    const payload = {
+      ...item,
+      id,
+      videoUrl: item.videoUrl ?? '',
+      youtubeId: item.youtubeId ?? '',
+      fullImage: item.fullImage ?? '',
+      badge: (item as any).badge ?? '',
+      displayOrder: item.order ?? 0,
+      isPublished: true,
+      updatedAt: new Date().toISOString(),
+      createdAt: item.createdAt || new Date().toISOString(),
+    };
+
+    await safeSetDoc(
       doc(db, 'creativeWorks', id),
-      {
-        ...item,
-        id,
-        displayOrder: item.order ?? 0,
-        isPublished: true,
-        updatedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-      },
+      payload,
       { merge: true }
     );
   } catch (err) {
@@ -440,7 +519,7 @@ export function subscribeToServices(
 export async function saveService(service: Service): Promise<void> {
   const id = service.id || `service-${Date.now()}`;
   try {
-    await setDoc(
+    await safeSetDoc(
       doc(db, 'services', id),
       {
         ...service,
@@ -559,7 +638,7 @@ export function subscribeToPricing(
 export async function savePricingPlan(plan: PricingPlan): Promise<void> {
   const id = plan.id || `plan-${Date.now()}`;
   try {
-    await setDoc(
+    await safeSetDoc(
       doc(db, 'pricingPlans', id),
       {
         ...plan,
@@ -610,7 +689,7 @@ export async function fetchAddons(): Promise<AddonService[]> {
 export async function saveAddon(addon: AddonService): Promise<void> {
   const id = addon.id || `addon-${Date.now()}`;
   try {
-    await setDoc(
+    await safeSetDoc(
       doc(db, 'addOns', id),
       {
         ...addon,
@@ -724,7 +803,7 @@ export function subscribeToTestimonials(
 export async function saveTestimonial(testimonial: Testimonial): Promise<void> {
   const id = testimonial.id || `testimonial-${Date.now()}`;
   try {
-    await setDoc(
+    await safeSetDoc(
       doc(db, 'testimonials', id),
       {
         ...testimonial,
@@ -811,7 +890,7 @@ export function subscribeToFaqs(
 export async function saveFaq(faq: FaqItem): Promise<void> {
   const id = faq.id || `faq-${Date.now()}`;
   try {
-    await setDoc(
+    await safeSetDoc(
       doc(db, 'faqs', id),
       {
         ...faq,
@@ -913,7 +992,7 @@ export function subscribeToSiteProfile(
 
 export async function saveSiteProfile(profile: SiteProfile): Promise<void> {
   try {
-    await setDoc(
+    await safeSetDoc(
       doc(db, 'siteSettings', 'global'),
       {
         ...profile,
@@ -945,21 +1024,22 @@ export async function submitContactRequest(params: {
   whatsappNumber?: string;
 }): Promise<{ success: boolean; id?: string }> {
   try {
-    const docRef = await addDoc(collection(db, 'contactRequests'), {
-      name: params.name.trim(),
-      email: params.email?.trim() || '',
-      phone: params.phone?.trim() || params.whatsappNumber || '',
-      company: params.company?.trim() || params.businessName || '',
-      businessName: params.businessName?.trim() || '',
-      businessType: params.businessType?.trim() || '',
+    const docRef = await safeAddDoc(collection(db, 'contactRequests'), {
+      name: (params.name || '').trim(),
+      email: (params.email || '').trim(),
+      phone: (params.phone || params.whatsappNumber || '').trim(),
+      company: (params.company || params.businessName || '').trim(),
+      businessName: (params.businessName || '').trim(),
+      businessType: (params.businessType || '').trim(),
       serviceNeeded: params.serviceNeeded || '',
       budgetRange: params.budgetRange || '',
       deadline: params.deadline || '',
       referenceLinks: params.referenceLinks || '',
-      message: params.projectDetails.trim(),
-      projectDetails: params.projectDetails.trim(),
+      message: (params.projectDetails || '').trim(),
+      projectDetails: (params.projectDetails || '').trim(),
       preferredContact: params.preferredContact || 'Messenger',
       messengerLink: params.messengerLink || 'https://m.me/happyperson7410',
+      whatsappNumber: params.whatsappNumber || '',
       status: 'new',
       createdAt: new Date().toISOString(),
       serverTimestamp: serverTimestamp(),
@@ -1007,8 +1087,8 @@ export async function updateContactRequestStatus(
   status: 'new' | 'in_review' | 'contacted' | 'archived' | string
 ): Promise<void> {
   try {
-    await updateDoc(doc(db, 'contactRequests', id), {
-      status,
+    await safeUpdateDoc(doc(db, 'contactRequests', id), {
+      status: status || 'new',
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {
@@ -1142,7 +1222,7 @@ export async function seedInitialDataIfEmpty(): Promise<boolean> {
     // Seed default projects
     for (let i = 0; i < DEFAULT_PROJECTS.length; i++) {
       const p = DEFAULT_PROJECTS[i];
-      await setDoc(doc(db, 'projects', p.id || `project-${i + 1}`), {
+      await safeSetDoc(doc(db, 'projects', p.id || `project-${i + 1}`), {
         ...p,
         displayOrder: i + 1,
         isPublished: true,
@@ -1154,7 +1234,7 @@ export async function seedInitialDataIfEmpty(): Promise<boolean> {
     // Seed default creative works
     for (let i = 0; i < DEFAULT_CREATIVE.length; i++) {
       const c = DEFAULT_CREATIVE[i];
-      await setDoc(doc(db, 'creativeWorks', c.id || `creative-${i + 1}`), {
+      await safeSetDoc(doc(db, 'creativeWorks', c.id || `creative-${i + 1}`), {
         ...c,
         displayOrder: i + 1,
         isPublished: true,
@@ -1166,7 +1246,7 @@ export async function seedInitialDataIfEmpty(): Promise<boolean> {
     // Seed services
     for (let i = 0; i < DEFAULT_SERVICES.length; i++) {
       const s = DEFAULT_SERVICES[i];
-      await setDoc(doc(db, 'services', s.id || `service-${i + 1}`), {
+      await safeSetDoc(doc(db, 'services', s.id || `service-${i + 1}`), {
         ...s,
         displayOrder: i + 1,
         isPublished: true,
@@ -1178,7 +1258,7 @@ export async function seedInitialDataIfEmpty(): Promise<boolean> {
     // Seed pricing plans
     for (let i = 0; i < DEFAULT_PRICING.length; i++) {
       const pr = DEFAULT_PRICING[i];
-      await setDoc(doc(db, 'pricingPlans', pr.id || `plan-${i + 1}`), {
+      await safeSetDoc(doc(db, 'pricingPlans', pr.id || `plan-${i + 1}`), {
         ...pr,
         displayOrder: i + 1,
         isPublished: true,
@@ -1190,7 +1270,7 @@ export async function seedInitialDataIfEmpty(): Promise<boolean> {
     // Seed add-ons
     for (let i = 0; i < DEFAULT_ADDONS.length; i++) {
       const a = DEFAULT_ADDONS[i];
-      await setDoc(doc(db, 'addOns', a.id || `addon-${i + 1}`), {
+      await safeSetDoc(doc(db, 'addOns', a.id || `addon-${i + 1}`), {
         ...a,
         displayOrder: i + 1,
         isPublished: true,
@@ -1202,7 +1282,7 @@ export async function seedInitialDataIfEmpty(): Promise<boolean> {
     // Seed testimonials
     for (let i = 0; i < DEFAULT_TESTIMONIALS.length; i++) {
       const t = DEFAULT_TESTIMONIALS[i];
-      await setDoc(doc(db, 'testimonials', t.id || `testimonial-${i + 1}`), {
+      await safeSetDoc(doc(db, 'testimonials', t.id || `testimonial-${i + 1}`), {
         ...t,
         displayOrder: i + 1,
         isPublished: true,
@@ -1214,7 +1294,7 @@ export async function seedInitialDataIfEmpty(): Promise<boolean> {
     // Seed FAQs
     for (let i = 0; i < DEFAULT_FAQS.length; i++) {
       const f = DEFAULT_FAQS[i];
-      await setDoc(doc(db, 'faqs', `faq-${i + 1}`), {
+      await safeSetDoc(doc(db, 'faqs', `faq-${i + 1}`), {
         ...f,
         id: `faq-${i + 1}`,
         displayOrder: i + 1,
@@ -1225,7 +1305,7 @@ export async function seedInitialDataIfEmpty(): Promise<boolean> {
     }
 
     // Seed site profile
-    await setDoc(doc(db, 'siteSettings', 'global'), {
+    await safeSetDoc(doc(db, 'siteSettings', 'global'), {
       ...DEFAULT_PROFILE,
       isAvailableForProjects: true,
       displayOrder: 1,
@@ -1245,7 +1325,7 @@ export async function forceSeedDatabase(): Promise<void> {
   // Clear and rewrite with default showcase data
   for (let i = 0; i < DEFAULT_PROJECTS.length; i++) {
     const p = DEFAULT_PROJECTS[i];
-    await setDoc(doc(db, 'projects', p.id || `project-${i + 1}`), {
+    await safeSetDoc(doc(db, 'projects', p.id || `project-${i + 1}`), {
       ...p,
       displayOrder: i + 1,
       isPublished: true,
@@ -1256,7 +1336,7 @@ export async function forceSeedDatabase(): Promise<void> {
 
   for (let i = 0; i < DEFAULT_CREATIVE.length; i++) {
     const c = DEFAULT_CREATIVE[i];
-    await setDoc(doc(db, 'creativeWorks', c.id || `creative-${i + 1}`), {
+    await safeSetDoc(doc(db, 'creativeWorks', c.id || `creative-${i + 1}`), {
       ...c,
       displayOrder: i + 1,
       isPublished: true,
@@ -1267,7 +1347,7 @@ export async function forceSeedDatabase(): Promise<void> {
 
   for (let i = 0; i < DEFAULT_SERVICES.length; i++) {
     const s = DEFAULT_SERVICES[i];
-    await setDoc(doc(db, 'services', s.id || `service-${i + 1}`), {
+    await safeSetDoc(doc(db, 'services', s.id || `service-${i + 1}`), {
       ...s,
       displayOrder: i + 1,
       isPublished: true,
@@ -1278,7 +1358,7 @@ export async function forceSeedDatabase(): Promise<void> {
 
   for (let i = 0; i < DEFAULT_PRICING.length; i++) {
     const pr = DEFAULT_PRICING[i];
-    await setDoc(doc(db, 'pricingPlans', pr.id || `plan-${i + 1}`), {
+    await safeSetDoc(doc(db, 'pricingPlans', pr.id || `plan-${i + 1}`), {
       ...pr,
       displayOrder: i + 1,
       isPublished: true,
@@ -1289,7 +1369,7 @@ export async function forceSeedDatabase(): Promise<void> {
 
   for (let i = 0; i < DEFAULT_TESTIMONIALS.length; i++) {
     const t = DEFAULT_TESTIMONIALS[i];
-    await setDoc(doc(db, 'testimonials', t.id || `testimonial-${i + 1}`), {
+    await safeSetDoc(doc(db, 'testimonials', t.id || `testimonial-${i + 1}`), {
       ...t,
       displayOrder: i + 1,
       isPublished: true,
@@ -1300,7 +1380,7 @@ export async function forceSeedDatabase(): Promise<void> {
 
   for (let i = 0; i < DEFAULT_FAQS.length; i++) {
     const f = DEFAULT_FAQS[i];
-    await setDoc(doc(db, 'faqs', `faq-${i + 1}`), {
+    await safeSetDoc(doc(db, 'faqs', `faq-${i + 1}`), {
       ...f,
       id: `faq-${i + 1}`,
       displayOrder: i + 1,
@@ -1310,7 +1390,7 @@ export async function forceSeedDatabase(): Promise<void> {
     });
   }
 
-  await setDoc(doc(db, 'siteSettings', 'global'), {
+  await safeSetDoc(doc(db, 'siteSettings', 'global'), {
     ...DEFAULT_PROFILE,
     isAvailableForProjects: true,
     displayOrder: 1,

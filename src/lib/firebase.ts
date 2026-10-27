@@ -21,9 +21,11 @@ export const resolvedFirebaseConfig = {
 // Initialize Firebase App singleton
 export const app = !getApps().length ? initializeApp(resolvedFirebaseConfig) : getApp();
 
-// CRITICAL: Must use firestoreDatabaseId from env or firebase-applet-config.json
-const firestoreDbId = env?.VITE_FIREBASE_FIRESTORE_DATABASE_ID || firebaseConfig.firestoreDatabaseId || '(default)';
-export const db = getFirestore(app, firestoreDbId);
+// Use default Firestore database instance (or env override if explicitly customized)
+const envDbId = env?.VITE_FIREBASE_FIRESTORE_DATABASE_ID;
+export const db = (envDbId && envDbId !== '(default)' && !envDbId.includes('ai-studio-portfolio'))
+  ? getFirestore(app, envDbId)
+  : getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 

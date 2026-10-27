@@ -100,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await setDoc(
         doc(db, 'admins', cred.user.uid),
         {
-          email: cred.user.email,
+          email: cred.user.email || '',
           displayName: cred.user.displayName || 'Portfolio Owner',
           role: 'owner',
           provider: 'google',

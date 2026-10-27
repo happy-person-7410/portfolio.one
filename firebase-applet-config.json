@@ -3,7 +3,7 @@
   "appId": "1:587147846627:web:06e16b9445c2e9e11336d6",
   "apiKey": "AIzaSyDuUkn1GubT6zBBZHY6VJ9LsCZlOYwnNpc",
   "authDomain": "portfolio-58191.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-portfolioone-5c70045b-8d83-4c68-9274-58a523ba3ca6",
+  "firestoreDatabaseId": "(default)",
   "storageBucket": "portfolio-58191.firebasestorage.app",
   "messagingSenderId": "587147846627",
   "measurementId": "",
