@@ -4,6 +4,8 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
   User as FirebaseUser,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -35,9 +37,14 @@ export const OWNER_EMAIL = GENERATED_ADMIN_EMAIL;
 
 export function isOwner(email?: string | null): boolean {
   if (!email) return false;
+  const lower = email.toLowerCase().trim();
+  const envAdmin = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_EMAIL)
+    ? String(import.meta.env.VITE_ADMIN_EMAIL).toLowerCase().trim()
+    : '';
   return (
-    email.toLowerCase() === GENERATED_ADMIN_EMAIL.toLowerCase() ||
-    email.toLowerCase() === 'happyperson7410@gmail.com'
+    lower === GENERATED_ADMIN_EMAIL.toLowerCase() ||
+    lower === 'happyperson7410@gmail.com' ||
+    (envAdmin !== '' && lower === envAdmin)
   );
 }
 
@@ -73,8 +80,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const loginWithGoogle = async () => {
-    // Single designated owner authentication via email/password
-    await handleLoginWithEmail(GENERATED_ADMIN_EMAIL, GENERATED_ADMIN_PASSWORD);
+    setAuthError(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const cred = await signInWithPopup(auth, provider);
+      const email = cred.user.email?.toLowerCase();
+
+      if (!email || !isOwner(email)) {
+        await signOut(auth);
+        setUser(null);
+        setToken(null);
+        const err = `Access denied for ${email || 'this Google account'}. Only the portfolio owner is authorized.`;
+        setAuthError(err);
+        throw new Error(err);
+      }
+
+      // Record in admins collection for audit and security rules
+      await setDoc(
+        doc(db, 'admins', cred.user.uid),
+        {
+          email: cred.user.email,
+          displayName: cred.user.displayName || 'Portfolio Owner',
+          role: 'owner',
+          provider: 'google',
+          lastLoginAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      const idToken = await cred.user.getIdToken();
+      setUser({
+        id: cred.user.uid,
+        email: cred.user.email || '',
+        role: 'admin',
+      });
+      setToken(idToken);
+    } catch (err: any) {
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        return; // User clicked away from popup
+      }
+      const msg = err.message || 'Google sign-in failed. Please try again.';
+      setAuthError(msg);
+      throw err;
+    }
   };
 
   const handleLoginWithEmail = async (email: string, pass: string) => {
