@@ -5,11 +5,25 @@ import { getStorage } from 'firebase/storage';
 import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 import firebaseConfig from '../../firebase-applet-config.json';
 
-// Initialize Firebase App singleton
-export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Dynamically resolve configuration with import.meta.env overriding bundled values
+const env = typeof import.meta !== 'undefined' ? import.meta.env : ({} as Record<string, string>);
 
-// CRITICAL: Must use firestoreDatabaseId from firebase-applet-config.json
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const resolvedFirebaseConfig = {
+  apiKey: env?.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
+  authDomain: env?.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain || 'portfolio-58191.firebaseapp.com',
+  projectId: env?.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId || 'portfolio-58191',
+  storageBucket: env?.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig.storageBucket || 'portfolio-58191.firebasestorage.app',
+  messagingSenderId: env?.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig.messagingSenderId,
+  appId: env?.VITE_FIREBASE_APP_ID || firebaseConfig.appId,
+  measurementId: env?.VITE_FIREBASE_MEASUREMENT_ID || firebaseConfig.measurementId,
+};
+
+// Initialize Firebase App singleton
+export const app = !getApps().length ? initializeApp(resolvedFirebaseConfig) : getApp();
+
+// CRITICAL: Must use firestoreDatabaseId from env or firebase-applet-config.json
+const firestoreDbId = env?.VITE_FIREBASE_FIRESTORE_DATABASE_ID || firebaseConfig.firestoreDatabaseId || '(default)';
+export const db = getFirestore(app, firestoreDbId);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 
